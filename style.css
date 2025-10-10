@@ -1,0 +1,98 @@
+body {
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f2f5;
+    margin: 0;
+}
+
+#auth-container {
+    width: 400px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#login-form, #register-form {
+    display: flex;
+    flex-direction: column;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+input, select {
+    height: 40px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+}
+
+button {
+    height: 40px;
+    background-color: #1877f2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #166fe5;
+}
+
+p {
+    text-align: center;
+    margin-top: 10px;
+}
+
+a {
+    color: #1877f2;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#app-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+nav {
+    display: flex;
+    background-color: #1877f2;
+    padding: 0 10px;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link {
+    padding: 15px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+.nav-link.active {
+    border-bottom: 3px solid white;
+}
+
+#app-content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
