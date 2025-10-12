@@ -1,19 +1,36 @@
+/* ChatWay Styling */
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;700&display=swap');
+
+:root {
+    --background-main: #FFF5F0;
+    --chat-bubble-pink: #F8A8B4;
+    --chat-bubble-orange: #F9A66C;
+    --button-active: #FF7F50;
+    --text-main: #3C3C3C;
+    --button-background: #FFFFFF;
+    --hover-selection: #FFDAB9;
+    --white: #FFFFFF;
+    --border-color: #dddfe2;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
 body {
-    font-family: sans-serif;
+    font-family: 'Roboto', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f0f2f5;
+    background-color: var(--background-main);
     margin: 0;
+    color: var(--text-main);
 }
 
 #auth-container {
     width: 400px;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: var(--button-background);
+    padding: 30px;
+    border-radius: 15px; /* Rounded corners */
+    box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 #login-form, #register-form {
@@ -22,41 +39,46 @@ body {
 }
 
 h1 {
+    font-family: 'Pacifico', cursive;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    color: var(--button-active);
 }
 
 input, select {
-    height: 40px;
-    margin-bottom: 10px;
-    padding: 0 10px;
-    border: 1px solid #dddfe2;
-    border-radius: 6px;
+    height: 45px;
+    margin-bottom: 15px;
+    padding: 0 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px; /* Rounded corners */
+    background-color: #f9f9f9;
 }
 
 button {
-    height: 40px;
-    background-color: #1877f2;
-    color: white;
+    height: 45px;
+    background-color: var(--button-active);
+    color: var(--white);
     border: none;
-    border-radius: 6px;
+    border-radius: 10px; /* Rounded corners */
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #166fe5;
+    background-color: #E57248; /* Darker coral */
 }
 
 p {
     text-align: center;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
 a {
-    color: #1877f2;
+    color: var(--button-active);
     text-decoration: none;
+    font-weight: bold;
 }
 
 a:hover {
@@ -68,31 +90,64 @@ a:hover {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: white;
+    background-color: var(--background-main);
 }
 
 nav {
     display: flex;
-    background-color: #1877f2;
-    padding: 0 10px;
-    color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(90deg, var(--chat-bubble-pink), var(--chat-bubble-orange));
+    padding: 0 20px;
+    color: var(--white);
+    box-shadow: 0 2px 5px var(--shadow-color);
 }
 
 .nav-link {
-    padding: 15px 20px;
+    padding: 15px 25px;
     cursor: pointer;
     font-weight: bold;
-    color: white;
+    color: var(--white);
     text-decoration: none;
+    transition: background-color 0.3s ease;
+    border-bottom: 4px solid transparent;
 }
 
 .nav-link.active {
-    border-bottom: 3px solid white;
+    border-bottom: 4px solid var(--white);
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 #app-content {
     flex-grow: 1;
     padding: 20px;
     overflow-y: auto;
+}
+
+.content-section h2 {
+    font-family: 'Pacifico', cursive;
+    color: var(--text-main);
+    margin-bottom: 20px;
+}
+
+.user-card {
+    background-color: var(--white);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-card p {
+    margin: 0;
+}
+
+.user-card button {
+    height: 35px;
+    font-size: 14px;
+    padding: 0 15px;
 }
