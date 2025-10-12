@@ -74,43 +74,210 @@ document.addEventListener('DOMContentLoaded', () => {
         loginForm.style.display = 'flex';
     });
 
-    // --- Simulated Login/Registration ---
+    let currentUser = null; // Variable to hold current user data
+
+    // --- Main App Logic ---
     const showApp = async () => {
-        authContainer.style.display = 'none';
-        appContainer.style.display = 'flex';
-        await loadUsers();
-    };
+        const { data: { user } } = await supabase.auth.getUser();
+        currentUser = user;
 
-    // --- Load Users for "Hacer Amigos" section ---
-    const loadUsers = async () => {
-        const userList = document.querySelector('#hacer-amigos');
-
-        // Clear previous list
-        userList.innerHTML = '<h2>Hacer Amigos</h2>';
-
-        const { data: profiles, error } = await supabase
-            .from('profiles')
-            .select('full_name, country');
-
-        if (error) {
-            console.error('Error fetching profiles:', error);
-            const errorElement = document.createElement('p');
-            errorElement.textContent = 'Could not load users.';
-            userList.appendChild(errorElement);
+        if (!currentUser) {
+            alert("Could not get user session. Returning to login.");
+            authContainer.style.display = 'block';
+            appContainer.style.display = 'none';
             return;
         }
 
+        authContainer.style.display = 'none';
+        appContainer.style.display = 'flex';
+        await loadCoupleRequests();
+        await loadFriendRequests();
+        await loadUsers();
+    };
+
+    // --- Couple System ---
+    const acceptCoupleRequest = async (requestId, senderId) => {
+        // Step 1: Update request to 'accepted'
+        const { error: updateError } = await supabase.from('couple_requests').update({ status: 'accepted' }).eq('id', requestId);
+        if (updateError) return alert('Error accepting couple request.');
+
+        // Step 2: Create the couple record
+        const { error: insertError } = await supabase.from('couples').insert({ user1_id: currentUser.id, user2_id: senderId });
+        if (insertError) return alert('Error creating couple.');
+
+        // Step 3: Reject any other pending couple requests for both users
+        const userIds = [currentUser.id, senderId];
+        await supabase.from('couple_requests').update({ status: 'rejected' }).in('sender_id', userIds).eq('status', 'pending');
+        await supabase.from('couple_requests').update({ status: 'rejected' }).in('receiver_id', userIds).eq('status', 'pending');
+
+        // Step 4: Refresh UI
+        await loadCoupleRequests();
+        await loadUsers();
+    };
+
+    const rejectCoupleRequest = async (requestId) => {
+        const { error } = await supabase.from('couple_requests').update({ status: 'rejected' }).eq('id', requestId);
+        if (error) return alert('Error rejecting couple request.');
+        await loadCoupleRequests();
+    };
+
+    const loadCoupleRequests = async () => {
+        const requestsContainer = document.getElementById('couple-requests-container');
+        requestsContainer.innerHTML = '<h3>Solicitudes de Pareja</h3>'; // Reset
+
+        const { data: requests, error } = await supabase
+            .from('couple_requests')
+            .select('id, sender_id, profiles:sender_id (full_name)')
+            .eq('receiver_id', currentUser.id)
+            .eq('status', 'pending');
+
+        if (error) return console.error('Error fetching couple requests:', error);
+
+        if (requests && requests.length > 0) {
+            requests.forEach(req => {
+                const reqEl = document.createElement('div');
+                reqEl.classList.add('user-card');
+                reqEl.innerHTML = `
+                    <p><strong>${req.profiles.full_name}</strong> quiere ser tu pareja.</p>
+                    <div>
+                        <button class="accept-couple-btn" data-request-id="${req.id}" data-sender-id="${req.sender_id}">Aceptar</button>
+                        <button class="reject-couple-btn" data-request-id="${req.id}">Rechazar</button>
+                    </div>`;
+                requestsContainer.appendChild(reqEl);
+            });
+            document.querySelectorAll('.accept-couple-btn').forEach(b => b.addEventListener('click', e => acceptCoupleRequest(e.target.dataset.requestId, e.target.dataset.senderId)));
+            document.querySelectorAll('.reject-couple-btn').forEach(b => b.addEventListener('click', e => rejectCoupleRequest(e.target.dataset.requestId)));
+        } else {
+            requestsContainer.innerHTML += '<p>No tienes solicitudes de pareja pendientes.</p>';
+        }
+    };
+
+    const sendCoupleRequest = async (receiverId) => {
+        const senderId = currentUser.id;
+        const { error } = await supabase.from('couple_requests').insert({ sender_id: senderId, receiver_id: receiverId });
+        if (error) {
+            alert(`Error sending couple request: ${error.message}`);
+        } else {
+            // Reload users to update the button state
+            loadUsers();
+        }
+    };
+
+    // --- Friend System ---
+    const sendFriendRequest = async (receiverId) => {
+        const senderId = currentUser.id;
+        const { error } = await supabase.from('friend_requests').insert({ sender_id: senderId, receiver_id: receiverId });
+        if (error) {
+            alert(`Error sending friend request: ${error.message}`);
+        } else {
+            loadUsers(); // Reload user list to show updated status
+        }
+    };
+
+    const acceptFriendRequest = async (requestId, senderId) => {
+        // Step 1: Update the request status to 'accepted'
+        const { error: updateError } = await supabase.from('friend_requests').update({ status: 'accepted' }).eq('id', requestId);
+        if (updateError) return alert('Error accepting request.');
+
+        // Step 2: Create a new friendship record
+        const { error: insertError } = await supabase.from('friendships').insert({ user1_id: currentUser.id, user2_id: senderId });
+        if (insertError) return alert('Error creating friendship.');
+
+        // Step 3: Refresh the UI
+        await loadFriendRequests();
+        await loadUsers();
+    };
+
+    const rejectFriendRequest = async (requestId) => {
+        const { error } = await supabase.from('friend_requests').update({ status: 'rejected' }).eq('id', requestId);
+        if (error) return alert('Error rejecting request.');
+        await loadFriendRequests(); // Just refresh the requests list
+    };
+
+    const loadFriendRequests = async () => {
+        const requestsContainer = document.getElementById('friend-requests-container');
+        requestsContainer.innerHTML = '<h3>Solicitudes de Amistad</h3>'; // Reset container
+
+        const { data: requests, error } = await supabase
+            .from('friend_requests')
+            .select('id, sender_id, profiles:sender_id (full_name)')
+            .eq('receiver_id', currentUser.id)
+            .eq('status', 'pending');
+
+        if (error) return console.error('Error fetching requests:', error);
+
+        if (requests && requests.length > 0) {
+            requests.forEach(req => {
+                const reqEl = document.createElement('div');
+                reqEl.classList.add('user-card');
+                reqEl.innerHTML = `
+                    <p><strong>${req.profiles.full_name}</strong> te envió una solicitud.</p>
+                    <div>
+                        <button class="accept-btn" data-request-id="${req.id}" data-sender-id="${req.sender_id}">Aceptar</button>
+                        <button class="reject-btn" data-request-id="${req.id}">Rechazar</button>
+                    </div>`;
+                requestsContainer.appendChild(reqEl);
+            });
+            // Add event listeners
+            document.querySelectorAll('.accept-btn').forEach(b => b.addEventListener('click', e => acceptFriendRequest(e.target.dataset.requestId, e.target.dataset.senderId)));
+            document.querySelectorAll('.reject-btn').forEach(b => b.addEventListener('click', e => rejectFriendRequest(e.target.dataset.requestId)));
+        } else {
+            requestsContainer.innerHTML += '<p>No tienes solicitudes pendientes.</p>';
+        }
+    };
+
+    const loadUsers = async () => {
+        const userListContainer = document.getElementById('user-list-container');
+        userListContainer.innerHTML = ''; // Clear previous list
+
+        // Fetch all necessary data in parallel
+        const [ { data: profiles, error: pError }, { data: friendships, error: fError }, { data: couples, error: cError }, { data: sentFriendRequests, error: sfrError }, { data: sentCoupleRequests, error: scrError } ] = await Promise.all([
+            supabase.from('profiles').select('id, full_name, country').neq('id', currentUser.id),
+            supabase.from('friendships').select('*').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`),
+            supabase.from('couples').select('*').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`),
+            supabase.from('friend_requests').select('receiver_id').eq('sender_id', currentUser.id).eq('status', 'pending'),
+            supabase.from('couple_requests').select('receiver_id').eq('sender_id', currentUser.id).eq('status', 'pending')
+        ]);
+
+        if (pError || fError || cError || sfrError || scrError) return console.error('Error fetching user data:', pError || fError || cError || sfrError || scrError);
+
+        // Create sets for quick lookups
+        const friends = new Set(friendships.map(f => f.user1_id === currentUser.id ? f.user2_id : f.user1_id));
+        const partner = new Set(couples.map(c => c.user1_id === currentUser.id ? c.user2_id : c.user1_id));
+        const sentFriendPending = new Set(sentFriendRequests.map(r => r.receiver_id));
+        const sentCouplePending = new Set(sentCoupleRequests.map(r => r.receiver_id));
+
         if (profiles) {
             profiles.forEach(profile => {
-                const userElement = document.createElement('div');
-                userElement.classList.add('user-card'); // for styling
-                userElement.innerHTML = `
-                    <p><strong>${profile.full_name}</strong></p>
-                    <p><em>${profile.country}</em></p>
-                    <button>Add Friend</button>
+                let buttonHtml;
+                if (partner.has(profile.id)) {
+                    buttonHtml = '<button disabled>Pareja</button>';
+                } else if (friends.has(profile.id)) {
+                    if (sentCouplePending.has(profile.id)) {
+                        buttonHtml = '<button disabled>Solicitud de Pareja Enviada</button>';
+                    } else {
+                        buttonHtml = `<button class="propose-couple-btn" data-userid="${profile.id}">Proponer Pareja</button>`;
+                    }
+                } else if (sentFriendPending.has(profile.id)) {
+                    buttonHtml = '<button disabled>Solicitud Enviada</button>';
+                } else {
+                    buttonHtml = `<button class="add-friend-btn" data-userid="${profile.id}">Agregar Amigo</button>`;
+                }
+
+                const userEl = document.createElement('div');
+                userEl.classList.add('user-card');
+                userEl.innerHTML = `
+                    <div>
+                        <p><strong>${profile.full_name}</strong></p>
+                        <p><em>${profile.country}</em></p>
+                    </div>
+                    ${buttonHtml}
                 `;
-                userList.appendChild(userElement);
+                userListContainer.appendChild(userEl);
             });
+            // Add event listeners to the actionable buttons
+            document.querySelectorAll('.add-friend-btn').forEach(b => b.addEventListener('click', e => sendFriendRequest(e.target.dataset.userid)));
+            document.querySelectorAll('.propose-couple-btn').forEach(b => b.addEventListener('click', e => sendCoupleRequest(e.target.dataset.userid)));
         }
     };
 
