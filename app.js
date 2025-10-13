@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const supabaseUrl = 'https://fzmankchbxunxygovgqp.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6bWFua2NoYnh1bnh5Z292Z3FwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwOTAzNjIsImV4cCI6MjA3NTY2NjM2Mn0.0QBTHnhpeumfFnFCZ5XS8QwomG_hCfj2dGqJUS335j8';
 
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Main App Logic ---
     const showApp = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         currentUser = user;
 
         if (!currentUser) {
@@ -92,17 +92,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Couple System ---
     const acceptCoupleRequest = async (requestId, senderId) => {
         // Step 1: Update request to 'accepted'
-        const { error: updateError } = await supabase.from('couple_requests').update({ status: 'accepted' }).eq('id', requestId);
+        const { error: updateError } = await supabaseClient.from('couple_requests').update({ status: 'accepted' }).eq('id', requestId);
         if (updateError) return alert('Error accepting couple request.');
 
         // Step 2: Create the couple record
-        const { error: insertError } = await supabase.from('couples').insert({ user1_id: currentUser.id, user2_id: senderId });
+        const { error: insertError } = await supabaseClient.from('couples').insert({ user1_id: currentUser.id, user2_id: senderId });
         if (insertError) return alert('Error creating couple.');
 
         // Step 3: Reject any other pending couple requests for both users
         const userIds = [currentUser.id, senderId];
-        await supabase.from('couple_requests').update({ status: 'rejected' }).in('sender_id', userIds).eq('status', 'pending');
-        await supabase.from('couple_requests').update({ status: 'rejected' }).in('receiver_id', userIds).eq('status', 'pending');
+        await supabaseClient.from('couple_requests').update({ status: 'rejected' }).in('sender_id', userIds).eq('status', 'pending');
+        await supabaseClient.from('couple_requests').update({ status: 'rejected' }).in('receiver_id', userIds).eq('status', 'pending');
 
         // Step 4: Refresh UI
         await loadCoupleRequests();
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const rejectCoupleRequest = async (requestId) => {
-        const { error } = await supabase.from('couple_requests').update({ status: 'rejected' }).eq('id', requestId);
+        const { error } = await supabaseClient.from('couple_requests').update({ status: 'rejected' }).eq('id', requestId);
         if (error) return alert('Error rejecting couple request.');
         await loadCoupleRequests();
     };
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const requestsContainer = document.getElementById('couple-requests-container');
         requestsContainer.innerHTML = '<h3>Solicitudes de Pareja</h3>'; // Reset
 
-        const { data: requests, error } = await supabase
+        const { data: requests, error } = await supabaseClient
             .from('couple_requests')
             .select('id, sender_id, profiles:sender_id (full_name)')
             .eq('receiver_id', currentUser.id)
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sendCoupleRequest = async (receiverId) => {
         const senderId = currentUser.id;
-        const { error } = await supabase.from('couple_requests').insert({ sender_id: senderId, receiver_id: receiverId });
+        const { error } = await supabaseClient.from('couple_requests').insert({ sender_id: senderId, receiver_id: receiverId });
         if (error) {
             alert(`Error sending couple request: ${error.message}`);
         } else {
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Friend System ---
     const sendFriendRequest = async (receiverId) => {
         const senderId = currentUser.id;
-        const { error } = await supabase.from('friend_requests').insert({ sender_id: senderId, receiver_id: receiverId });
+        const { error } = await supabaseClient.from('friend_requests').insert({ sender_id: senderId, receiver_id: receiverId });
         if (error) {
             alert(`Error sending friend request: ${error.message}`);
         } else {
@@ -170,11 +170,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const acceptFriendRequest = async (requestId, senderId) => {
         // Step 1: Update the request status to 'accepted'
-        const { error: updateError } = await supabase.from('friend_requests').update({ status: 'accepted' }).eq('id', requestId);
+        const { error: updateError } = await supabaseClient.from('friend_requests').update({ status: 'accepted' }).eq('id', requestId);
         if (updateError) return alert('Error accepting request.');
 
         // Step 2: Create a new friendship record
-        const { error: insertError } = await supabase.from('friendships').insert({ user1_id: currentUser.id, user2_id: senderId });
+        const { error: insertError } = await supabaseClient.from('friendships').insert({ user1_id: currentUser.id, user2_id: senderId });
         if (insertError) return alert('Error creating friendship.');
 
         // Step 3: Refresh the UI
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const rejectFriendRequest = async (requestId) => {
-        const { error } = await supabase.from('friend_requests').update({ status: 'rejected' }).eq('id', requestId);
+        const { error } = await supabaseClient.from('friend_requests').update({ status: 'rejected' }).eq('id', requestId);
         if (error) return alert('Error rejecting request.');
         await loadFriendRequests(); // Just refresh the requests list
     };
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const requestsContainer = document.getElementById('friend-requests-container');
         requestsContainer.innerHTML = '<h3>Solicitudes de Amistad</h3>'; // Reset container
 
-        const { data: requests, error } = await supabase
+        const { data: requests, error } = await supabaseClient
             .from('friend_requests')
             .select('id, sender_id, profiles:sender_id (full_name)')
             .eq('receiver_id', currentUser.id)
@@ -226,11 +226,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Fetch all necessary data in parallel
         const [ { data: profiles, error: pError }, { data: friendships, error: fError }, { data: couples, error: cError }, { data: sentFriendRequests, error: sfrError }, { data: sentCoupleRequests, error: scrError } ] = await Promise.all([
-            supabase.from('profiles').select('id, full_name, country').neq('id', currentUser.id),
-            supabase.from('friendships').select('*').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`),
-            supabase.from('couples').select('*').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`),
-            supabase.from('friend_requests').select('receiver_id').eq('sender_id', currentUser.id).eq('status', 'pending'),
-            supabase.from('couple_requests').select('receiver_id').eq('sender_id', currentUser.id).eq('status', 'pending')
+            supabaseClient.from('profiles').select('id, full_name, country').neq('id', currentUser.id),
+            supabaseClient.from('friendships').select('*').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`),
+            supabaseClient.from('couples').select('*').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`),
+            supabaseClient.from('friend_requests').select('receiver_id').eq('sender_id', currentUser.id).eq('status', 'pending'),
+            supabaseClient.from('couple_requests').select('receiver_id').eq('sender_id', currentUser.id).eq('status', 'pending')
         ]);
 
         if (pError || fError || cError || sfrError || scrError) return console.error('Error fetching user data:', pError || fError || cError || sfrError || scrError);
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = loginForm.querySelector('input[type="email"]').value;
         const password = loginForm.querySelector('input[type="password"]').value;
 
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
             email: email,
             password: password,
         });
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // --- Sign up user ---
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await supabaseClient.auth.signUp({
             email: email,
             password: password,
             options: {
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Apply content moderation before sending
         content = moderateContent(content);
 
-        const { error } = await supabase.from('messages').insert({
+        const { error } = await supabaseClient.from('messages').insert({
             conversation_id: activeConversation.conversationId,
             sender_id: currentUser.id,
             content: content
@@ -385,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesContainer.innerHTML = ''; // Clear old messages
 
         // Find or create the conversation
-        let { data: conversation, error: convoError } = await supabase.from('conversations')
+        let { data: conversation, error: convoError } = await supabaseClient.from('conversations')
             .select('id').or(`(user1_id.eq.${currentUser.id},and(user2_id.eq.${partnerId})),(user1_id.eq.${partnerId},and(user2_id.eq.${currentUser.id}))`).single();
 
         if (convoError && convoError.code !== 'PGRST116') { // PGRST116: no rows found, which is fine
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!conversation) {
-            const { data: newConvo, error: createError } = await supabase.from('conversations').insert({ user1_id: currentUser.id, user2_id: partnerId }).select().single();
+            const { data: newConvo, error: createError } = await supabaseClient.from('conversations').insert({ user1_id: currentUser.id, user2_id: partnerId }).select().single();
             if (createError) return console.error('Error creating conversation:', createError);
             conversation = newConvo;
         }
@@ -401,13 +401,13 @@ document.addEventListener('DOMContentLoaded', () => {
         activeConversation = { conversationId: conversation.id, partnerId };
 
         // Fetch initial messages
-        const { data: messages, error: msgError } = await supabase.from('messages').select('*, sender:sender_id(full_name)').eq('conversation_id', conversation.id).order('created_at');
+        const { data: messages, error: msgError } = await supabaseClient.from('messages').select('*, sender:sender_id(full_name)').eq('conversation_id', conversation.id).order('created_at');
         if (msgError) return console.error('Error fetching messages:', msgError);
 
         messages.forEach(msg => displayMessage(msg));
 
         // Subscribe to real-time updates
-        const channel = supabase.channel(`messages_${conversation.id}`)
+        const channel = supabaseClient.channel(`messages_${conversation.id}`)
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversation.id}` }, payload => {
                 displayMessage(payload.new);
             })
@@ -435,8 +435,8 @@ document.addEventListener('DOMContentLoaded', () => {
         conversationsList.innerHTML = '<h3>Conversaciones</h3>'; // Reset
 
         const [ { data: friendships, error: fError }, { data: couple, error: cError } ] = await Promise.all([
-            supabase.from('friendships').select('user1_id, user2_id, profiles1:user1_id(full_name), profiles2:user2_id(full_name)').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`),
-            supabase.from('couples').select('user1_id, user2_id, profiles1:user1_id(full_name), profiles2:user2_id(full_name)').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`).single()
+            supabaseClient.from('friendships').select('user1_id, user2_id, profiles1:user1_id(full_name), profiles2:user2_id(full_name)').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`),
+            supabaseClient.from('couples').select('user1_id, user2_id, profiles1:user1_id(full_name), profiles2:user2_id(full_name)').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`).single()
         ]);
 
         if (fError || cError) return console.error("Error fetching conversations", fError || cError);
