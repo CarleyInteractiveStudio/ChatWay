@@ -1,14 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Supabase Client Initialization ---
-    // IMPORTANT: Replace these placeholders with your actual Supabase credentials.
-    // Do NOT commit these keys to version control.
-    const supabaseUrl = '!!!_REPLACE_WITH_YOUR_SUPABASE_URL_!!!';
-    const supabaseKey = '!!!_REPLACE_WITH_YOUR_SUPABASE_ANON_KEY_!!!';
-
-    if (supabaseUrl.startsWith('!!!') || supabaseKey.startsWith('!!!')) {
-        alert('CRITICAL ERROR: Supabase credentials have not been configured in app.js. The application cannot start.');
-        throw new Error('Supabase credentials not configured.');
-    }
+    // --- Supabase Client Initialization ---
+    const supabaseUrl = 'https://fzmankchbxunxygovgqp.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6bWFua2NoYnh1bnh5Z292Z3FwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwOTAzNjIsImV4cCI6MjA3NTY2NjM2Mn0.0QBTHnhpeumfFnFCZ5XS8QwomG_hCfj2dGqJUS335j8';
 
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
