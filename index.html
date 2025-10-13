@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatWay</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+    <div id="notification-container" class="hidden"></div>
     <div id="auth-container">
         <!-- Login Form -->
         <div id="login-form">
@@ -31,8 +31,10 @@
                 <option value="male">Male</option>
                 <option value="female">Female</option>
             </select>
-            <input type="text" placeholder="Country" required>
-            <input type="text" placeholder="Language" required>
+            <div id="language-select-container">
+                <label>Idiomas que hablas:</label>
+                <!-- Languages will be injected here by JS -->
+            </div>
             <button>Register</button>
             <p>Already have an account? <a href="#" id="show-login">Login</a></p>
         </div>
@@ -42,7 +44,7 @@
         <nav>
             <a href="#" class="nav-link active" data-target="mundo">Mundo</a>
             <a href="#" class="nav-link" data-target="chat">Chat</a>
-            <a href="#" class="nav-link" data-target="hacer-amigos">Hacer Amigos</a>
+            <a href="#" class="nav-link" data-target="personas">Personas</a>
             <a href="#" class="nav-link" data-target="juego">Juego</a>
         </nav>
         <main id="app-content">
@@ -51,33 +53,12 @@
                 <!-- Content for Mundo -->
             </div>
             <div id="chat" class="content-section" style="display: none;">
-                <div id="conversations-list">
-                    <!-- List of conversations will be injected here -->
-                </div>
-                <div id="chat-window">
-                    <div id="chat-header"></div>
-                    <div id="messages-container">
-                        <!-- Messages will be injected here -->
-                    </div>
-                    <div id="chat-input">
-                        <input type="text" id="message-input" placeholder="Escribe un mensaje...">
-                        <button id="send-button">Enviar</button>
-                    </div>
-                </div>
+                <h2>Chat</h2>
+                <!-- Content for Chat -->
             </div>
-            <div id="hacer-amigos" class="content-section" style="display: none;">
-                <div id="couple-requests-container">
-                    <h3>Solicitudes de Pareja</h3>
-                    <!-- Couple requests will be injected here -->
-                </div>
-                <div id="friend-requests-container">
-                    <h3>Solicitudes de Amistad</h3>
-                    <!-- Friend requests will be injected here -->
-                </div>
-                <h2 id="user-list-title">Descubrir Personas</h2>
-                <div id="user-list-container">
-                    <!-- User list will be injected here -->
-                </div>
+            <div id="personas" class="content-section" style="display: none;">
+                <h2>Personas</h2>
+                <!-- Content for Personas -->
             </div>
             <div id="juego" class="content-section" style="display: none;">
                 <h2>Juego</h2>
