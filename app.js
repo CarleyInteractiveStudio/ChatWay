@@ -355,10 +355,147 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Chat System ---
+    let activeConversation = { conversationId: null, partnerId: null, unsubscribe: null };
+
+    const sendMessage = async () => {
+        let content = document.getElementById('message-input').value.trim();
+        if (!content || !activeConversation.conversationId) return;
+
+        // Apply content moderation before sending
+        content = moderateContent(content);
+
+        const { error } = await supabase.from('messages').insert({
+            conversation_id: activeConversation.conversationId,
+            sender_id: currentUser.id,
+            content: content
+        });
+
+        if (error) {
+            alert('Error sending message.');
+            console.error('Send message error:', error);
+        } else {
+            document.getElementById('message-input').value = '';
+        }
+    };
+
+    const loadMessages = async (partnerId, partnerName) => {
+        // Unsubscribe from previous real-time channel if it exists
+        if (activeConversation.unsubscribe) activeConversation.unsubscribe();
+
+        // Update UI
+        document.querySelectorAll('.conversation-item').forEach(item => item.classList.remove('active'));
+        document.querySelector(`.conversation-item[data-user-id="${partnerId}"]`).classList.add('active');
+        document.getElementById('chat-header').textContent = `Chat con ${partnerName}`;
+        const messagesContainer = document.getElementById('messages-container');
+        messagesContainer.innerHTML = ''; // Clear old messages
+
+        // Find or create the conversation
+        let { data: conversation, error: convoError } = await supabase.from('conversations')
+            .select('id').or(`(user1_id.eq.${currentUser.id},and(user2_id.eq.${partnerId})),(user1_id.eq.${partnerId},and(user2_id.eq.${currentUser.id}))`).single();
+
+        if (convoError && convoError.code !== 'PGRST116') { // PGRST116: no rows found, which is fine
+            return console.error('Error finding conversation:', convoError);
+        }
+
+        if (!conversation) {
+            const { data: newConvo, error: createError } = await supabase.from('conversations').insert({ user1_id: currentUser.id, user2_id: partnerId }).select().single();
+            if (createError) return console.error('Error creating conversation:', createError);
+            conversation = newConvo;
+        }
+
+        activeConversation = { conversationId: conversation.id, partnerId };
+
+        // Fetch initial messages
+        const { data: messages, error: msgError } = await supabase.from('messages').select('*, sender:sender_id(full_name)').eq('conversation_id', conversation.id).order('created_at');
+        if (msgError) return console.error('Error fetching messages:', msgError);
+
+        messages.forEach(msg => displayMessage(msg));
+
+        // Subscribe to real-time updates
+        const channel = supabase.channel(`messages_${conversation.id}`)
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversation.id}` }, payload => {
+                displayMessage(payload.new);
+            })
+            .subscribe();
+
+        activeConversation.unsubscribe = () => channel.unsubscribe();
+    };
+
+    const displayMessage = (message) => {
+        const messagesContainer = document.getElementById('messages-container');
+        const msgEl = document.createElement('div');
+        msgEl.classList.add('message');
+        if (message.sender_id === currentUser.id) {
+            msgEl.classList.add('sent');
+        } else {
+            msgEl.classList.add('received');
+        }
+        msgEl.textContent = message.content;
+        messagesContainer.appendChild(msgEl);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll to bottom
+    };
+
+    const loadConversations = async () => {
+        const conversationsList = document.getElementById('conversations-list');
+        conversationsList.innerHTML = '<h3>Conversaciones</h3>'; // Reset
+
+        const [ { data: friendships, error: fError }, { data: couple, error: cError } ] = await Promise.all([
+            supabase.from('friendships').select('user1_id, user2_id, profiles1:user1_id(full_name), profiles2:user2_id(full_name)').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`),
+            supabase.from('couples').select('user1_id, user2_id, profiles1:user1_id(full_name), profiles2:user2_id(full_name)').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`).single()
+        ]);
+
+        if (fError || cError) return console.error("Error fetching conversations", fError || cError);
+
+        const conversationPartners = new Map();
+        if (couple) {
+            const partner = couple.user1_id === currentUser.id ? { id: couple.user2_id, ...couple.profiles2 } : { id: couple.user1_id, ...couple.profiles1 };
+            conversationPartners.set(partner.id, partner.full_name);
+        }
+        friendships.forEach(f => {
+            const friend = f.user1_id === currentUser.id ? { id: f.user2_id, ...f.profiles2 } : { id: f.user1_id, ...f.profiles1 };
+            conversationPartners.set(friend.id, friend.full_name);
+        });
+
+        if (conversationPartners.size === 0) {
+            conversationsList.innerHTML += '<p>No tienes amigos para chatear.</p>';
+            return;
+        }
+
+        conversationPartners.forEach((name, id) => {
+            const convoEl = document.createElement('div');
+            convoEl.classList.add('conversation-item');
+            convoEl.dataset.userId = id;
+            convoEl.dataset.userName = name;
+            convoEl.textContent = name;
+            conversationsList.appendChild(convoEl);
+        });
+
+        // Add event listeners to conversation items
+        document.querySelectorAll('.conversation-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const partnerId = e.target.dataset.userId;
+                const partnerName = e.target.dataset.userName;
+                loadMessages(partnerId, partnerName);
+            });
+        });
+    };
+
+    // --- Event Listeners for Chat Input ---
+    document.getElementById('send-button').addEventListener('click', sendMessage);
+    document.getElementById('message-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
     // --- Main App Navigation ---
     navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
+        link.addEventListener('click', async (e) => {
             e.preventDefault();
+            if (link.dataset.target === 'chat') {
+                await loadConversations();
+            }
 
             // Deactivate all links
             navLinks.forEach(navLink => navLink.classList.remove('active'));
