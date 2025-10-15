@@ -32,31 +32,63 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     };
 
-    // --- Language Selector ---
-    const languages = ["Afrikaans", "Albanian", "Amharic", "Arabic", "Armenian", "Azerbaijani", "Basque", "Belarusian", "Bengali", "Bosnian", "Bulgarian", "Catalan", "Cebuano", "Chinese (Simplified)", "Chinese (Traditional)", "Corsican", "Croatian", "Czech", "Danish", "Dutch", "English", "Esperanto", "Estonian", "Finnish", "French", "Frisian", "Galician", "Georgian", "German", "Greek", "Gujarati", "Haitian Creole", "Hausa", "Hawaiian", "Hebrew", "Hindi", "Hmong", "Hungarian", "Icelandic", "Igbo", "Indonesian", "Irish", "Italian", "Japanese", "Javanese", "Kannada", "Kazakh", "Khmer", "Kinyarwanda", "Korean", "Kurdish", "Kyrgyz", "Lao", "Latin", "Latvian", "Lithuanian", "Luxembourgish", "Macedonian", "Malagasy", "Malay", "Malayalam", "Maltese", "Maori", "Marathi", "Mongolian", "Myanmar (Burmese)", "Nepali", "Norwegian", "Nyanja (Chichewa)", "Odia (Oriya)", "Pashto", "Persian", "Polish", "Portuguese", "Punjabi", "Romanian", "Russian", "Samoan", "Scots Gaelic", "Serbian", "Sesotho", "Shona", "Sindhi", "Sinhala (Sinhalese)", "Slovak", "Slovenian", "Somali", "Spanish", "Sundanese", "Swahili", "Swedish", "Tagalog (Filipino)", "Tajik", "Tamil", "Tatar", "Telugu", "Thai", "Turkish", "Turkmen", "Ukrainian", "Urdu", "Uyghur", "Uzbek", "Vietnamese", "Welsh", "Xhosa", "Yiddish", "Yoruba", "Zulu"];
+    // --- Language Search Component ---
+    const allLanguages = ["Afrikaans", "Albanian", "Amharic", "Arabic", "Armenian", "Azerbaijani", "Basque", "Belarusian", "Bengali", "Bosnian", "Bulgarian", "Catalan", "Cebuano", "Chinese (Simplified)", "Chinese (Traditional)", "Corsican", "Croatian", "Czech", "Danish", "Dutch", "English", "Esperanto", "Estonian", "Finnish", "French", "Frisian", "Galician", "Georgian", "German", "Greek", "Gujarati", "Haitian Creole", "Hausa", "Hawaiian", "Hebrew", "Hindi", "Hmong", "Hungarian", "Icelandic", "Igbo", "Indonesian", "Irish", "Italian", "Japanese", "Javanese", "Kannada", "Kazakh", "Khmer", "Kinyarwanda", "Korean", "Kurdish", "Kyrgyz", "Lao", "Latin", "Latvian", "Lithuanian", "Luxembourgish", "Macedonian", "Malagasy", "Malay", "Malayalam", "Maltese", "Maori", "Marathi", "Mongolian", "Myanmar (Burmese)", "Nepali", "Norwegian", "Nyanja (Chichewa)", "Odia (Oriya)", "Pashto", "Persian", "Polish", "Portuguese", "Punjabi", "Romanian", "Russian", "Samoan", "Scots Gaelic", "Serbian", "Sesotho", "Shona", "Sindhi", "Sinhala (Sinhalese)", "Slovak", "Slovenian", "Somali", "Spanish", "Sundanese", "Swahili", "Swedish", "Tagalog (Filipino)", "Tajik", "Tamil", "Tatar", "Telugu", "Thai", "Turkish", "Turkmen", "Ukrainian", "Urdu", "Uyghur", "Uzbek", "Vietnamese", "Welsh", "Xhosa", "Yiddish", "Yoruba", "Zulu"];
+    let selectedLanguages = new Set();
 
-    const populateLanguages = () => {
-        const container = document.getElementById('language-select-container');
-        languages.forEach(lang => {
-            const div = document.createElement('div');
-            div.classList.add('language-option');
+    const languageSearchInput = document.getElementById('language-search-input');
+    const suggestionsContainer = document.getElementById('language-suggestions');
+    const tagsContainer = document.getElementById('selected-languages-tags');
 
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = `lang-${lang}`;
-            checkbox.name = 'language';
-            checkbox.value = lang;
-
-            const label = document.createElement('label');
-            label.htmlFor = `lang-${lang}`;
-            label.textContent = lang;
-            label.style.marginLeft = '5px';
-
-            div.appendChild(checkbox);
-            div.appendChild(label);
-            container.appendChild(div);
+    const renderTags = () => {
+        tagsContainer.innerHTML = '';
+        selectedLanguages.forEach(lang => {
+            const tag = document.createElement('div');
+            tag.classList.add('language-tag');
+            tag.textContent = lang;
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = '×';
+            removeBtn.addEventListener('click', () => removeLanguage(lang));
+            tag.appendChild(removeBtn);
+            tagsContainer.appendChild(tag);
         });
     };
+
+    const addLanguage = (lang) => {
+        selectedLanguages.add(lang);
+        languageSearchInput.value = '';
+        suggestionsContainer.innerHTML = '';
+        suggestionsContainer.style.display = 'none';
+        renderTags();
+    };
+
+    const removeLanguage = (lang) => {
+        selectedLanguages.delete(lang);
+        renderTags();
+    };
+
+    languageSearchInput.addEventListener('input', () => {
+        const query = languageSearchInput.value.toLowerCase();
+        suggestionsContainer.innerHTML = '';
+        if (!query) {
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+
+        const filtered = allLanguages.filter(lang =>
+            lang.toLowerCase().includes(query) && !selectedLanguages.has(lang)
+        );
+
+        filtered.slice(0, 5).forEach(lang => { // Show max 5 suggestions
+            const item = document.createElement('div');
+            item.classList.add('suggestion-item');
+            item.textContent = lang;
+            item.addEventListener('click', () => addLanguage(lang));
+            suggestionsContainer.appendChild(item);
+        });
+
+        suggestionsContainer.style.display = filtered.length > 0 ? 'block' : 'none';
+    });
 
     // --- Geolocation ---
     let detectedCountry = '';
@@ -122,7 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const dob = registerForm.querySelector('input[type="date"]').value;
         const sex = registerForm.querySelector('select').value;
 
-        const selectedLanguages = Array.from(document.querySelectorAll('input[name="language"]:checked')).map(cb => cb.value);
+        // Get selected languages from the Set
+        const languagesArray = Array.from(selectedLanguages);
 
         // Validation
         const nameRegex = /^[a-zA-Z\s]+$/;
@@ -136,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (age < 18) {
             return showNotification("Debes tener al menos 18 años para registrarte.", "error");
         }
-        if (selectedLanguages.length === 0) {
+        if (languagesArray.length === 0) {
             return showNotification("Debes seleccionar al menos un idioma.", "error");
         }
 
@@ -149,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     date_of_birth: dob,
                     gender: sex,
                     country: detectedCountry,
-                    language: selectedLanguages.join(', '),
+                    language: languagesArray.join(', '),
                 }
             }
         });
@@ -173,5 +206,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    populateLanguages();
 });

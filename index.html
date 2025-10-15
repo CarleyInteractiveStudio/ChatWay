@@ -31,9 +31,11 @@
                 <option value="male">Male</option>
                 <option value="female">Female</option>
             </select>
-            <div id="language-select-container">
-                <label>Idiomas que hablas:</label>
-                <!-- Languages will be injected here by JS -->
+            <div id="language-search-container">
+                <label>Idiomas que hablas (obligatorio):</label>
+                <div id="selected-languages-tags"></div>
+                <input type="text" id="language-search-input" placeholder="Busca un idioma...">
+                <div id="language-suggestions"></div>
             </div>
             <button>Register</button>
             <p>Already have an account? <a href="#" id="show-login">Login</a></p>

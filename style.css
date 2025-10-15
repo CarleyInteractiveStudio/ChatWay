@@ -129,3 +129,73 @@ nav {
     font-family: 'Pacifico', cursive;
     color: var(--text-main);
 }
+
+/* Language Search Component Styles */
+#language-search-container {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+#language-search-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+#selected-languages-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    min-height: 30px;
+}
+
+.language-tag {
+    background-color: var(--button-active);
+    color: var(--white);
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.language-tag button {
+    background: none;
+    border: none;
+    color: var(--white);
+    margin-left: 8px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 16px;
+    height: auto;
+}
+
+#language-search-input {
+    width: calc(100% - 30px); /* Adjust for padding */
+}
+
+#language-suggestions {
+    position: absolute;
+    width: 100%;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    z-index: 10;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background-color: var(--hover-selection);
+}
