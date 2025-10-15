@@ -347,6 +347,7 @@ if (conversationsList && chatWindow && backToConversationsButton) {
         if (conversationItem) {
             conversationsList.style.display = 'none';
             chatWindow.style.display = 'flex'; // Use flex because the window is a flex container
+            mainNav.style.display = 'none'; // Hide main navigation
 
             // Fetch messages for the selected conversation
             const conversationId = parseInt(conversationItem.dataset.conversationId, 10);
@@ -362,6 +363,7 @@ if (conversationsList && chatWindow && backToConversationsButton) {
     backToConversationsButton.addEventListener('click', () => {
         chatWindow.style.display = 'none';
         conversationsList.style.display = 'block';
+        mainNav.style.display = 'grid'; // Show main navigation again
         currentConversationId = null;
 
         // Unsubscribe from the channel when leaving the chat window
