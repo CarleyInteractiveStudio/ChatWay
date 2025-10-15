@@ -108,9 +108,236 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// --- Chat UI Logic ---
+// --- Chat Logic ---
 const conversationsList = document.getElementById('conversations-list');
 const chatWindow = document.getElementById('chat-window');
+const sendButton = document.getElementById('send-button');
+const messageInput = document.getElementById('message-input');
+let currentConversationId = null; // This will hold the ID of the currently open conversation
+
+// Handle sending a new message
+if (sendButton && messageInput) {
+    sendButton.addEventListener('click', async () => {
+        const messageText = messageInput.value.trim();
+        if (messageText === '') return;
+
+        // 1. Get the current logged-in user
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+            showNotification('Debes iniciar sesión para enviar mensajes.', 'error');
+            return;
+        }
+
+        // 2. Define the message payload
+        // Use the currently active conversation ID
+        if (!currentConversationId) {
+            showNotification('Selecciona una conversación válida primero.', 'error');
+            return;
+        }
+
+        const messagePayload = {
+            sender_id: user.id,
+            conversation_id: conversationId,
+            content: messageText
+        };
+
+        // Add reply information if in reply mode
+        if (replyingToMessage) {
+            messagePayload.replied_to_message_id = replyingToMessage.id;
+        }
+
+        // 3. Insert the message into the database
+        const { error } = await supabaseClient.from('messages').insert([messagePayload]);
+
+        if (error) {
+            showNotification(`Error al enviar el mensaje: ${error.message}`, 'error');
+        } else {
+            messageInput.value = ''; // Clear the input field
+            // Reset reply mode
+            if (replyingToMessage) {
+                replyingToMessage = null;
+                replyBar.style.display = 'none';
+            }
+        }
+    });
+}
+
+/**
+ * Renders a list of conversations in the chat list view.
+ * @param {Array<object>} conversations Array of conversation objects.
+ */
+function renderConversations(conversations) {
+    if (!conversationsList) return;
+    // Clear the list, but keep the default "ChatWey" contact
+    conversationsList.innerHTML = `
+        <div class="conversation-item active" data-conversation-id="system">
+            <img src="img/Chatwey.png" alt="ChatWey Logo" class="avatar">
+            <div class="conversation-details">
+                <div class="conversation-name">ChatWey</div>
+                <div class="conversation-preview">Notificaciones del sistema</div>
+            </div>
+        </div>
+    `;
+
+    // In a real app, you would iterate over conversations and render them.
+    // For this correction, let's add a placeholder to show it's working.
+    const placeholderConv = document.createElement('div');
+    placeholderConv.className = 'conversation-item';
+    placeholderConv.dataset.conversationId = '1'; // Example ID
+    placeholderConv.innerHTML = `
+        <img src="img/Chatwey.png" alt="User Avatar" class="avatar">
+        <div class="conversation-details">
+            <div class="conversation-name">Usuario de Prueba</div>
+            <div class="conversation-preview">Haz clic para chatear...</div>
+        </div>
+    `;
+    conversationsList.appendChild(placeholderConv);
+}
+
+/**
+ * Fetches the conversations for the current user.
+ */
+async function fetchUserConversations() {
+    if (!localUser) return;
+    // This is a complex query. For now, we'll just render a placeholder.
+    // In a real app, you would query conversation_participants to find conversations
+    // where the user is a member.
+    renderConversations([]); // Pass empty array to render placeholder
+}
+
+const messagesContainer = document.getElementById('messages-container');
+let localUser = null; // To store the current user info
+let replyingToMessage = null; // To store info about the message being replied to
+
+// --- Reply UI Logic ---
+const replyBar = document.getElementById('reply-bar');
+const cancelReplyButton = document.getElementById('cancel-reply');
+
+// Activate reply mode when a message is clicked
+if (messagesContainer) {
+    messagesContainer.addEventListener('click', (event) => {
+        const messageBubble = event.target.closest('.message-bubble');
+        if (!messageBubble || !messageBubble.dataset.messageId) return;
+
+        const messageId = messageBubble.dataset.messageId;
+        const userName = messageBubble.querySelector('.user-name').textContent;
+        const messageText = messageBubble.querySelector('.text').textContent;
+
+        replyingToMessage = {
+            id: messageId,
+            user: userName,
+            text: messageText
+        };
+
+        // Show the reply bar
+        replyBar.querySelector('strong').textContent = userName;
+        replyBar.style.display = 'flex';
+        messageInput.focus(); // Focus the input field
+    });
+}
+
+// Cancel reply mode
+if (cancelReplyButton) {
+    cancelReplyButton.addEventListener('click', () => {
+        replyingToMessage = null;
+        replyBar.style.display = 'none';
+    });
+}
+
+/**
+ * Renders a single message object into the chat window.
+ * @param {object} message The message object from Supabase.
+ */
+function renderMessage(message) {
+    if (!localUser || !messagesContainer) return;
+
+    const messageBubble = document.createElement('div');
+    messageBubble.className = 'message-bubble';
+    messageBubble.dataset.messageId = message.id; // Add message ID for reply functionality
+
+    // Determine if the message is incoming or outgoing
+    if (message.sender_id === localUser.id) {
+        messageBubble.classList.add('outgoing');
+    } else {
+        messageBubble.classList.add('incoming');
+    }
+
+    const senderName = message.sender ? message.sender.name : (message.sender_id === localUser.id ? "Tú" : "Usuario Desconocido");
+
+    // Check if it's a reply and build the preview
+    let replyPreviewHTML = '';
+    if (message.replied_message && message.replied_message.sender) {
+        const repliedToUser = message.replied_message.sender.name;
+        replyPreviewHTML = `
+            <div class="reply-preview">
+                <div class="reply-user">${repliedToUser}</div>
+                <div class="reply-text">${message.replied_message.content}</div>
+            </div>
+        `;
+    }
+
+    messageBubble.innerHTML = `
+        <img src="img/Chatwey.png" alt="Avatar" class="avatar message-avatar">
+        <div class="message-content">
+            <div class="user-name">${senderName}</div>
+            ${replyPreviewHTML}
+            <div class="text">${message.content}</div>
+        </div>
+    `;
+    messagesContainer.appendChild(messageBubble);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll to bottom
+}
+
+/**
+ * Fetches all messages for a given conversation and renders them.
+ * @param {number} conversationId The ID of the conversation to fetch.
+ */
+async function fetchAndRenderMessages(conversationId) {
+    if (!messagesContainer) return;
+    messagesContainer.innerHTML = ''; // Clear previous messages
+
+    const { data: messages, error } = await supabaseClient
+        .from('messages')
+        .select(`
+            *,
+            sender:users ( name ),
+            replied_message:messages ( id, content, sender:users ( name ) )
+        `)
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        showNotification('Error al cargar los mensajes.', 'error');
+        console.error(error);
+    } else if (messages) {
+        messages.forEach(renderMessage);
+    }
+}
+
+let messageSubscription = null;
+
+/**
+ * Subscribes to real-time new messages for a given conversation.
+ * @param {number} conversationId The ID of the conversation to subscribe to.
+ */
+function subscribeToConversation(conversationId) {
+    // Unsubscribe from any previous channel
+    if (messageSubscription) {
+        supabaseClient.removeSubscription(messageSubscription);
+    }
+
+    messageSubscription = supabaseClient
+        .from(`messages:conversation_id=eq.${conversationId}`)
+        .on('INSERT', payload => {
+            // New message received, render it
+            renderMessage(payload.new);
+        })
+        .subscribe();
+
+    console.log(`Subscribed to conversation ${conversationId}`);
+}
+
+// --- Chat UI Navigation ---
 const backToConversationsButton = document.getElementById('back-to-conversations');
 
 if (conversationsList && chatWindow && backToConversationsButton) {
@@ -120,6 +347,14 @@ if (conversationsList && chatWindow && backToConversationsButton) {
         if (conversationItem) {
             conversationsList.style.display = 'none';
             chatWindow.style.display = 'flex'; // Use flex because the window is a flex container
+
+            // Fetch messages for the selected conversation
+            const conversationId = parseInt(conversationItem.dataset.conversationId, 10);
+            if (isNaN(conversationId)) return; // Ignore if the ID is not a number (e.g., 'system')
+
+            currentConversationId = conversationId; // Store the current conversation ID
+            fetchAndRenderMessages(conversationId);
+            subscribeToConversation(conversationId); // Subscribe to real-time updates
         }
     });
 
@@ -127,6 +362,14 @@ if (conversationsList && chatWindow && backToConversationsButton) {
     backToConversationsButton.addEventListener('click', () => {
         chatWindow.style.display = 'none';
         conversationsList.style.display = 'block';
+        currentConversationId = null;
+
+        // Unsubscribe from the channel when leaving the chat window
+        if (messageSubscription) {
+            supabaseClient.removeSubscription(messageSubscription);
+            messageSubscription = null;
+            console.log("Unsubscribed from conversation.");
+        }
     });
 }
 
@@ -241,8 +484,11 @@ const userEmailEl = document.getElementById('user-email');
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
     if (session && session.user) {
         // User is logged in
+        localUser = session.user; // Store user info for chat logic
         authContainer.style.display = 'none';
         appContainer.style.display = 'block';
+
+        fetchUserConversations(); // Fetch and render user's conversations
 
         // Fetch user profile and premium status
         const { data, error } = await supabaseClient

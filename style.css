@@ -120,6 +120,8 @@ header h1 {
 
 .nav-button ion-icon {
     font-size: 1.5rem;
+    color: inherit; /* Inherit color from the parent button */
+    display: block; /* Ensure it's treated as a block element */
 }
 
 .nav-button.active {
