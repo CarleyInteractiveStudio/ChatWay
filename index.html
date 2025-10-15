@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatWey</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+    <div id="auth-container">
+        <!-- Registration Form -->
+        <form id="register-form">
+            <h2>Crear una cuenta</h2>
+            <label for="name">Nombre:</label>
+            <input type="text" id="name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" required>
+
+            <label for="dob">Fecha de Nacimiento:</label>
+            <input type="date" id="dob" required>
+
+            <label for="sex">Sexo:</label>
+            <select id="sex" required>
+                <option value="masculino">Masculino</option>
+                <option value="femenino">Femenino</option>
+            </select>
+
+            <label for="country">País:</label>
+            <select id="country" required>
+                <!-- Countries will be loaded here dynamically -->
+                <option value="ES">España</option>
+                <option value="MX">México</option>
+                <option value="AR">Argentina</option>
+                <option value="US">Estados Unidos</option>
+            </select>
+
+            <label>Idiomas que hablas:</label>
+            <div>
+                <input type="checkbox" id="lang-es" name="language" value="es">
+                <label for="lang-es">Español</label>
+            </div>
+            <div>
+                <input type="checkbox" id="lang-en" name="language" value="en">
+                <label for="lang-en">Inglés</label>
+            </div>
+            <div>
+                <input type="checkbox" id="lang-fr" name="language" value="fr">
+                <label for="lang-fr">Francés</label>
+            </div>
+
+            <button type="submit">Registrarse</button>
+        </form>
+
+        <hr>
+
+        <!-- Login Form -->
+        <form id="login-form">
+            <h2>Iniciar Sesión</h2>
+            <label for="login-email">Email:</label>
+            <input type="email" id="login-email" required>
+
+            <label for="login-password">Contraseña:</label>
+            <input type="password" id="login-password" required>
+
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+    </div>
+
+    <!-- Main App View -->
+    <div id="app-container" style="display: none;">
+        <header>
+            <h1>ChatWey</h1>
+        </header>
+
+        <main id="main-content">
+            <!-- Section containers -->
+            <section id="comunidad-section" class="app-section">
+                <h2>Comunidad (Mundo)</h2>
+                <div class="feed">
+                    <!-- Posts will go here -->
+                    <p>El feed de "Mundo" aparecerá aquí.</p>
+                </div>
+            </section>
+
+            <section id="chat-section" class="app-section" style="display: none;">
+                <h2>Chat</h2>
+                <div id="conversations-list">
+                    <!-- Default ChatWey contact -->
+                    <div class="conversation-item active" data-conversation-id="system">
+                        <img src="img/Chatwey.png" alt="ChatWey Logo" class="avatar">
+                        <div class="conversation-details">
+                            <div class="conversation-name">ChatWey</div>
+                            <div class="conversation-preview">Notificaciones del sistema</div>
+                        </div>
+                    </div>
+                    <!-- Other conversations will be loaded here -->
+                </div>
+                <div id="chat-window" style="display: none;">
+                    <div id="chat-header">
+                        <button id="back-to-conversations">←</button>
+                        <span id="chat-with-name">ChatWey</span>
+                    </div>
+                    <div id="messages-container">
+                        <!-- Messages will be displayed here -->
+                    </div>
+                    <div id="message-input-container">
+                        <input type="text" id="message-input" placeholder="Escribe un mensaje...">
+                        <button id="send-button">Enviar</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="game-section" class="app-section" style="display: none;">
+                <div class="sub-nav">
+                    <button class="sub-nav-button active" data-subsection="game-store">Tienda</button>
+                    <button class="sub-nav-button" data-subsection="submit-game">Publicar Juego</button>
+                </div>
+
+                <!-- Game Store Subsection -->
+                <div id="game-store-subsection" class="sub-section">
+                    <h3>Tienda de Juegos</h3>
+                    <div class="game-card">
+                        <img src="img/Chatwey.png" alt="Game thumbnail">
+                        <div class="game-info">
+                            <h4>Nombre del Juego</h4>
+                            <p>Desarrollador: NombreDev</p>
+                        </div>
+                        <button class="play-button">Jugar</button>
+                    </div>
+                </div>
+
+                <!-- Submit Game Subsection -->
+                <div id="submit-game-subsection" class="sub-section" style="display: none;">
+                    <h3>Publicar tu Juego</h3>
+                    <form id="submit-game-form">
+                        <label for="game-title">Título del Juego:</label>
+                        <input type="text" id="game-title" required>
+
+                        <label for="game-description">Descripción:</label>
+                        <textarea id="game-description" rows="4" required></textarea>
+
+                        <label for="game-url">URL del Juego (HTML5):</label>
+                        <input type="url" id="game-url" placeholder="https://example.com/my-game/" required>
+
+                        <label for="game-version">Versión:</label>
+                        <input type="text" id="game-version" placeholder="1.0.0" required>
+
+                        <button type="submit">Enviar para Revisión</button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="conocer-personas-section" class="app-section" style="display: none;">
+                <div class="sub-nav">
+                    <button class="sub-nav-button active" data-subsection="discover">Conocer</button>
+                    <button class="sub-nav-button" data-subsection="sent">Enviadas</button>
+                    <button class="sub-nav-button" data-subsection="received">Recibidas</button>
+                </div>
+
+                <div id="discover-subsection" class="sub-section">
+                    <h3>Descubre a otros usuarios</h3>
+                    <!-- User cards will be loaded here -->
+                    <div class="user-card">
+                        <img src="img/Chatwey.png" alt="User avatar" class="avatar">
+                        <span>Nombre de Usuario</span>
+                        <button class="add-friend-button">Agregar Amigo</button>
+                    </div>
+                </div>
+
+                <div id="sent-subsection" class="sub-section" style="display: none;">
+                    <h3>Solicitudes Enviadas</h3>
+                    <!-- Sent requests will be listed here -->
+                </div>
+
+                <div id="received-subsection" class="sub-section" style="display: none;">
+                    <h3>Solicitudes Recibidas</h3>
+                    <!-- Received requests will be listed here -->
+                    <div class="request-card">
+                        <span>Nombre de Usuario te envió una solicitud</span>
+                        <button class="accept-button">Aceptar</button>
+                        <button class="reject-button">Rechazar</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="profile-section" class="app-section" style="display: none;">
+                <h2>Tu Perfil</h2>
+                <div class="profile-info">
+                    <p><strong>Nombre:</strong> <span id="user-name"></span></p>
+                    <p><strong>Email:</strong> <span id="user-email"></span></p>
+                    <p><strong>Estado:</strong> <span id="premium-status">Usuario Normal</span></p>
+                </div>
+
+                <div class="profile-management">
+                    <h3>Gestionar Imágenes</h3>
+                    <label for="profile-image">Foto de perfil:</label>
+                    <input type="file" id="profile-image">
+                    <label for="extra-image-1">Imagen extra 1:</label>
+                    <input type="file" id="extra-image-1">
+                    <label for="extra-image-2">Imagen extra 2:</label>
+                    <input type="file" id="extra-image-2">
+                </div>
+
+                <div class="premium-features">
+                    <h3>Funciones Premium</h3>
+                    <button id="create-group-button">Crear un Grupo</button>
+                </div>
+
+                <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+            </section>
+        </main>
+
+        <nav id="main-nav">
+            <button data-section="comunidad-section" class="nav-button active">Comunidad</button>
+            <button data-section="chat-section" class="nav-button">Chat</button>
+            <button data-section="game-section" class="nav-button">Game</button>
+            <button data-section="conocer-personas-section" class="nav-button">Conocer</button>
+            <button data-section="profile-section" class="nav-button">Perfil</button>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

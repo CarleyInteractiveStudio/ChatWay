@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administrador - ChatWey</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="admin-container">
+        <header>
+            <h1>Panel de Administrador</h1>
+        </header>
+
+        <main>
+            <nav class="sub-nav">
+                <button class="sub-nav-button active" data-subsection="users">Gestión de Usuarios</button>
+                <button class="sub-nav-button" data-subsection="games">Revisión de Juegos</button>
+                <button class="sub-nav-button" data-subsection="reports">Informes de Infidelidad</button>
+            </nav>
+
+            <!-- Users Management Subsection -->
+            <section id="users-subsection" class="sub-section">
+                <h2>Usuarios Registrados</h2>
+                <!-- User data will be loaded here -->
+            </section>
+
+            <!-- Games Review Subsection -->
+            <section id="games-subsection" class="sub-section" style="display: none;">
+                <h2>Juegos Pendientes de Revisión</h2>
+                <!-- Games to review will be listed here -->
+            </section>
+
+            <!-- Reports Review Subsection -->
+            <section id="reports-subsection" class="sub-section" style="display: none;">
+                <h2>Informes para Revisar</h2>
+                <!-- Incident reports will be listed here -->
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="app.js"></script> <!-- Re-using for Supabase client and utils -->
+    <script src="admin.js"></script>
+</body>
+</html>

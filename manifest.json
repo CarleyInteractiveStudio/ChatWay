@@ -1,0 +1,20 @@
+{
+    "short_name": "ChatWey",
+    "name": "ChatWey",
+    "icons": [
+        {
+            "src": "img/Chatwey.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "img/Chatwey.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ],
+    "start_url": "/index.html",
+    "display": "standalone",
+    "theme_color": "#F8A8B4",
+    "background_color": "#FFF5F0"
+}
