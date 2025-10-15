@@ -7,6 +7,8 @@
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 </head>
 <body>
     <div id="auth-container">
@@ -81,10 +83,20 @@
         <main id="main-content">
             <!-- Section containers -->
             <section id="comunidad-section" class="app-section">
-                <h2>Comunidad (Mundo)</h2>
-                <div class="feed">
-                    <!-- Posts will go here -->
-                    <p>El feed de "Mundo" aparecerá aquí.</p>
+                <h2>Comunidad</h2>
+                <div class="groups-list">
+                    <!-- "Mundo" Group -->
+                    <div class="group-item">
+                        <img src="img/Chatwey.png" alt="Mundo" class="avatar">
+                        <div class="group-details">
+                            <div class="group-name">
+                                <span>Mundo</span>
+                                <span class="unread-count">3</span>
+                            </div>
+                            <div class="group-preview">Usuario1: ¡Hola a todos! Bienvenidos...</div>
+                        </div>
+                    </div>
+                    <!-- Other groups will be listed here -->
                 </div>
             </section>
 
@@ -107,7 +119,38 @@
                         <span id="chat-with-name">ChatWey</span>
                     </div>
                     <div id="messages-container">
-                        <!-- Messages will be displayed here -->
+                        <!-- Example Incoming Message -->
+                        <div class="message-bubble incoming">
+                            <img src="img/Chatwey.png" alt="Avatar" class="avatar message-avatar">
+                            <div class="message-content">
+                                <div class="user-name">Otro Usuario</div>
+                                <div class="text">Este es un mensaje recibido.</div>
+                            </div>
+                        </div>
+                        <!-- Example Outgoing Message -->
+                        <div class="message-bubble outgoing">
+                            <img src="img/Chatwey.png" alt="Avatar" class="avatar message-avatar">
+                            <div class="message-content">
+                                <div class="user-name">Tú</div>
+                                <div class="text">Este es un mensaje que enviaste.</div>
+                            </div>
+                        </div>
+                        <!-- Example Reply Message -->
+                        <div class="message-bubble outgoing">
+                            <img src="img/Chatwey.png" alt="Avatar" class="avatar message-avatar">
+                            <div class="message-content">
+                                <div class="user-name">Tú</div>
+                                <div class="reply-preview">
+                                    <div class="reply-user">Otro Usuario</div>
+                                    <div class="reply-text">Este es un mensaje recibido.</div>
+                                </div>
+                                <div class="text">¡Respondiendo a tu mensaje!</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="reply-bar" style="display: none;">
+                        <span>Respondiendo a <strong>Usuario</strong></span>
+                        <button id="cancel-reply">×</button>
                     </div>
                     <div id="message-input-container">
                         <input type="text" id="message-input" placeholder="Escribe un mensaje...">
@@ -217,11 +260,27 @@
         </main>
 
         <nav id="main-nav">
-            <button data-section="comunidad-section" class="nav-button active">Comunidad</button>
-            <button data-section="chat-section" class="nav-button">Chat</button>
-            <button data-section="game-section" class="nav-button">Game</button>
-            <button data-section="conocer-personas-section" class="nav-button">Conocer</button>
-            <button data-section="profile-section" class="nav-button">Perfil</button>
+            <div class="nav-slider"></div>
+            <button data-section="comunidad-section" class="nav-button active">
+                <ion-icon name="people-outline"></ion-icon>
+                <span>Comunidad</span>
+            </button>
+            <button data-section="chat-section" class="nav-button">
+                <ion-icon name="chatbubbles-outline"></ion-icon>
+                <span>Chat</span>
+            </button>
+            <button data-section="game-section" class="nav-button">
+                <ion-icon name="game-controller-outline"></ion-icon>
+                <span>Game</span>
+            </button>
+            <button data-section="conocer-personas-section" class="nav-button">
+                <ion-icon name="heart-outline"></ion-icon>
+                <span>Conocer</span>
+            </button>
+            <button data-section="profile-section" class="nav-button">
+                <ion-icon name="person-outline"></ion-icon>
+                <span>Perfil</span>
+            </button>
         </nav>
     </div>
 

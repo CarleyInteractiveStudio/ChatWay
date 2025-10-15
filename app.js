@@ -196,14 +196,16 @@ if (conocerPersonasSection) {
 // --- Navigation Logic ---
 const mainNav = document.getElementById('main-nav');
 const appSections = document.querySelectorAll('.app-section');
-const navButtons = document.querySelectorAll('.nav-button');
+const navButtons = Array.from(document.querySelectorAll('.nav-button'));
+const navSlider = document.querySelector('.nav-slider');
 
-if (mainNav) {
+if (mainNav && navSlider) {
     mainNav.addEventListener('click', (event) => {
         const targetButton = event.target.closest('.nav-button');
         if (!targetButton) return;
 
         const targetSectionId = targetButton.dataset.section;
+        const targetIndex = navButtons.indexOf(targetButton);
 
         // Hide all sections
         appSections.forEach(section => {
@@ -221,6 +223,9 @@ if (mainNav) {
             button.classList.remove('active');
         });
         targetButton.classList.add('active');
+
+        // Move the slider
+        navSlider.style.transform = `translateX(${targetIndex * 100}%)`;
     });
 }
 
