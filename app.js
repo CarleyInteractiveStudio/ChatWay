@@ -276,12 +276,23 @@ function renderMessage(message) {
         `;
     }
 
+    // Add a timestamp and read-receipt status for outgoing messages
+    let statusIndicator = '';
+    if (message.sender_id === localUser.id) {
+        statusIndicator = `
+            <div class="message-status">
+                <ion-icon name="checkmark-done-outline" class="${message.status === 'visto' ? 'read' : ''}"></ion-icon>
+            </div>
+        `;
+    }
+
     messageBubble.innerHTML = `
         <img src="img/Chatwey.png" alt="Avatar" class="avatar message-avatar">
         <div class="message-content">
             <div class="user-name">${senderName}</div>
             ${replyPreviewHTML}
             <div class="text">${message.content}</div>
+            ${statusIndicator}
         </div>
     `;
     messagesContainer.appendChild(messageBubble);
@@ -311,6 +322,23 @@ async function fetchAndRenderMessages(conversationId) {
         console.error(error);
     } else if (messages) {
         messages.forEach(renderMessage);
+
+        // After rendering, mark all incoming messages as 'visto'
+        // This simulates the current user reading them.
+        const incomingMessageIds = messages
+            .filter(msg => msg.sender_id !== localUser.id && msg.status !== 'visto')
+            .map(msg => msg.id);
+
+        if (incomingMessageIds.length > 0) {
+            const { error: updateError } = await supabaseClient
+                .from('messages')
+                .update({ status: 'visto' })
+                .in('id', incomingMessageIds);
+
+            if (updateError) {
+                console.error("Error updating message status:", updateError);
+            }
+        }
     }
 }
 
@@ -331,6 +359,19 @@ function subscribeToConversation(conversationId) {
         .on('INSERT', payload => {
             // New message received, render it
             renderMessage(payload.new);
+        })
+        .on('UPDATE', payload => {
+            // A message was updated (e.g., status changed to 'visto')
+            const updatedMessage = payload.new;
+            if (updatedMessage.status === 'visto') {
+                const messageElement = messagesContainer.querySelector(`[data-message-id='${updatedMessage.id}']`);
+                if (messageElement) {
+                    const icon = messageElement.querySelector('.message-status ion-icon');
+                    if (icon) {
+                        icon.classList.add('read');
+                    }
+                }
+            }
         })
         .subscribe();
 

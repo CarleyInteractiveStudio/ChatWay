@@ -407,6 +407,8 @@ header h1 {
     flex-grow: 1;
     padding: 10px;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 #message-input-container {
@@ -433,6 +435,8 @@ header h1 {
     padding: 10px 15px;
     border-radius: 20px;
     color: white;
+    position: relative;
+    padding-right: 30px; /* Make space for the checkmark */
 }
 
 .message-bubble.incoming {
@@ -460,6 +464,18 @@ header h1 {
     font-size: 0.8rem;
     font-weight: bold;
     margin-bottom: 5px;
+}
+
+.message-status {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.message-status .read {
+    color: #4fc3f7; /* A bright blue for the "read" checkmark */
 }
 
 /* Reply Styles */

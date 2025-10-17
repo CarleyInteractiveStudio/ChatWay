@@ -65,6 +65,7 @@ CREATE TABLE messages (
     media_url TEXT, -- For images, audio, etc.
     media_type VARCHAR(50), -- image, audio, sticker
     replied_to_message_id INT REFERENCES messages(id), -- Self-referencing key for replies
+    status VARCHAR(50) DEFAULT 'enviado' NOT NULL, -- enviado, visto
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
