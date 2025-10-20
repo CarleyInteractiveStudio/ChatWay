@@ -137,7 +137,7 @@ if (sendButton && messageInput) {
 
         const messagePayload = {
             sender_id: user.id,
-            conversation_id: conversationId,
+            conversation_id: currentConversationId,
             content: messageText
         };
 
@@ -379,7 +379,18 @@ function subscribeToConversation(conversationId) {
 }
 
 // --- Chat UI Navigation ---
+const chatHeader = document.getElementById('chat-header');
 const backToConversationsButton = document.getElementById('back-to-conversations');
+
+if (chatHeader) {
+    chatHeader.addEventListener('click', (event) => {
+        // Make sure the click is not on the back button itself
+        if (event.target.closest('#back-to-conversations')) return;
+
+        // Placeholder action for viewing a profile
+        showNotification('Navegando al perfil del usuario...', 'success');
+    });
+}
 
 if (conversationsList && chatWindow && backToConversationsButton) {
     // Show chat window when a conversation is clicked

@@ -190,6 +190,11 @@ header h1 {
 }
 
 /* Chat Section Styles */
+#chat-section {
+    position: relative; /* Needed for absolute positioning of the child */
+    height: 100%;
+}
+
 #conversations-list {
     display: flex;
     flex-direction: column;
@@ -238,6 +243,11 @@ header h1 {
 #chat-window {
     display: flex;
     flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     height: 100%;
 }
 
@@ -246,6 +256,7 @@ header h1 {
     align-items: center;
     padding: 10px;
     border-bottom: 1px solid #eee;
+    cursor: pointer;
 }
 
 #chat-header button {
