@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatWey</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- "Conocer" Screen -->
+        <div id="conocer-screen" class="screen active">
+            <header>
+                <div class="search-bar">
+                    <ion-icon name="search-outline"></ion-icon>
+                    <input type="text" placeholder="Buscar personas...">
+                </div>
+            </header>
+            <main class="user-list">
+                <!-- User profiles will be injected here by JavaScript -->
+            </main>
+        </div>
+
+        <!-- "Chat" Screen (initially hidden) -->
+        <div id="chat-screen" class="screen">
+            <!-- Chat content will go here -->
+        </div>
+
+        <!-- "Perfil" Screen (initially hidden) -->
+        <div id="perfil-screen" class="screen">
+            <!-- Profile content will go here -->
+        </div>
+    </div>
+
+    <!-- Bubble Navigation Menu -->
+    <nav class="bubble-nav">
+        <a href="#" class="nav-item active" data-screen="conocer-screen">
+            <ion-icon name="people-outline"></ion-icon>
+            <span>Conocer</span>
+        </a>
+        <a href="#" class="nav-item" data-screen="chat-screen">
+            <ion-icon name="chatbubbles-outline"></ion-icon>
+            <span>Chat</span>
+        </a>
+        <a href="#" class="nav-item" data-screen="perfil-screen">
+            <ion-icon name="person-outline"></ion-icon>
+            <span>Perfil</span>
+        </a>
+    </nav>
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

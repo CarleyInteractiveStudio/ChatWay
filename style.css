@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;700&display=swap');
+
+:root {
+    --bg-color: #FFF5F0; /* Peach */
+    --primary-color: #F8A8B4; /* Pink */
+    --secondary-color: #F9A66C; /* Orange */
+    --text-color: #333;
+    --white-color: #fff;
+    --bubble-radius: 30px;
+    --card-radius: 20px;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 0;
+    padding-bottom: 80px; /* Space for the nav bar */
+    color: var(--text-color);
+}
+
+#app {
+    padding: 20px;
+}
+
+/* --- Screens --- */
+.screen {
+    display: none;
+}
+.screen.active {
+    display: block;
+}
+
+/* --- Header & Search Bar --- */
+header {
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: var(--white-color);
+    border-radius: var(--bubble-radius);
+    padding: 10px 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.search-bar ion-icon {
+    font-size: 1.2em;
+    color: var(--primary-color);
+    margin-right: 10px;
+}
+
+.search-bar input {
+    border: none;
+    outline: none;
+    width: 100%;
+    background: transparent;
+    font-size: 1em;
+}
+
+/* --- User List --- */
+.user-list {
+    display: grid;
+    gap: 15px;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    background-color: var(--white-color);
+    border-radius: var(--card-radius);
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease;
+}
+.user-card:hover {
+    transform: translateY(-3px);
+}
+
+.user-card .avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+    border: 2px solid var(--primary-color);
+}
+
+.user-card .user-info {
+    flex-grow: 1;
+}
+
+.user-card .user-info h3 {
+    margin: 0;
+    font-family: 'Pacifico', cursive;
+    font-size: 1.4em;
+    color: var(--primary-color);
+}
+
+.user-card .action-button {
+    border: none;
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    padding: 10px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 1.5em;
+}
+
+.user-card .action-button:hover {
+    background-color: var(--secondary-color);
+}
+
+.user-card .action-button.friends {
+    background-color: #4CAF50; /* Green for friends */
+}
+.user-card .action-button.friends:hover {
+    background-color: #45a049;
+}
+
+
+/* --- Bubble Navigation --- */
+.bubble-nav {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    background-color: var(--white-color);
+    border-radius: var(--bubble-radius);
+    padding: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-color);
+    padding: 5px 15px;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-item ion-icon {
+    font-size: 1.8em;
+    margin-bottom: 2px;
+}
+
+.nav-item span {
+    font-size: 0.8em;
+}
+
+.nav-item.active {
+    color: var(--primary-color);
+}
