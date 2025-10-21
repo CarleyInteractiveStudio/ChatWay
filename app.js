@@ -18,12 +18,30 @@ document.addEventListener('DOMContentLoaded', () => {
         { userId: 5, lastMessage: "Jajaja, qué gracioso.", timestamp: "1/3/2025", unreadCount: 3, isTyping: true },
     ];
 
+    // Simulating a database of messages for all conversations
+    let messages = {
+        // Conversation with Mateo (userId: 2)
+        2: [
+            { id: 1, senderId: 2, text: "¿Has visto la nueva película de la que todos hablan?", timestamp: "18:25", status: "seen", repliedToId: null },
+            { id: 2, senderId: 1, text: "¡Sí! La vi anoche. ¡Estuvo increíble!", timestamp: "18:28", status: "seen", repliedToId: 1 },
+            { id: 3, senderId: 1, text: "La cinematografía era espectacular.", timestamp: "18:28", status: "delivered", repliedToId: null },
+            { id: 4, senderId: 2, text: "Totalmente de acuerdo. Necesitamos ir a ver otra pronto.", timestamp: "18:30", status: "seen", repliedToId: null },
+            { id: 5, senderId: 1, text: "¡Claro! ¿A qué hora nos vemos?", timestamp: "18:32", status: "sent", repliedToId: null },
+        ]
+    };
+
     // Represents the current logged-in user.
     const currentUser = { id: 1 };
 
     const userListContainer = document.querySelector('.user-list');
+    const bubbleNavBar = document.getElementById('bubble-nav-bar');
+    const individualChatScreen = document.getElementById('individual-chat-screen');
+    const backToChatListButton = document.getElementById('back-to-chat-list');
+    const conversationListContainer = document.getElementById('conversation-list');
 
     // --- State Management ---
+    let currentOpenChatUserId = null;
+
     function getUser(id) {
         return users.find(u => u.id === id);
     }
@@ -130,8 +148,65 @@ document.addEventListener('DOMContentLoaded', () => {
                 </button>`;
     }
 
+    function renderMessages(userId) {
+        const messageListContainer = document.getElementById('message-list');
+        const user = getUser(userId);
+        if (!messageListContainer || !user) return;
+
+        // Update header
+        document.getElementById('chat-header-avatar').src = user.avatar;
+        document.getElementById('chat-header-name').textContent = user.name;
+
+        messageListContainer.innerHTML = '';
+        const chatMessages = messages[userId] || [];
+
+        chatMessages.forEach(msg => {
+            const messageBubble = document.createElement('div');
+            const isSent = msg.senderId === currentUser.id;
+            messageBubble.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
+
+            let repliedMessageHTML = '';
+            if (msg.repliedToId) {
+                const originalMsg = chatMessages.find(m => m.id === msg.repliedToId);
+                if (originalMsg) {
+                    const originalSenderName = originalMsg.senderId === currentUser.id ? 'Tú' : getUser(originalMsg.senderId).name;
+                    repliedMessageHTML = `
+                        <div class="reply-preview">
+                            <strong>${originalSenderName}</strong>
+                            <p>${originalMsg.text}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            messageBubble.innerHTML = `
+                ${repliedMessageHTML}
+                <p class="message-text">${msg.text}</p>
+                <div class="message-meta">
+                    <span class="timestamp">${msg.timestamp}</span>
+                    ${isSent ? renderStatusIcon(msg.status) : ''}
+                </div>
+            `;
+            messageListContainer.appendChild(messageBubble);
+        });
+
+        // Scroll to the bottom
+        messageListContainer.scrollTop = messageListContainer.scrollHeight;
+    }
+
+    function renderStatusIcon(status) {
+        let iconName = 'checkmark-outline'; // sent
+        let className = 'status-icon';
+        if (status === 'delivered') {
+            iconName = 'checkmark-done-outline';
+        } else if (status === 'seen') {
+            iconName = 'checkmark-done-outline';
+            className += ' seen';
+        }
+        return `<ion-icon name="${iconName}" class="${className}"></ion-icon>`;
+    }
+
     function renderChat() {
-        const conversationListContainer = document.getElementById('conversation-list');
         if (!conversationListContainer) return;
 
         conversationListContainer.innerHTML = '';
@@ -142,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const conversationItem = document.createElement('div');
             conversationItem.className = 'conversation-item';
+            conversationItem.dataset.userId = conv.userId;
 
             if (conv.unreadCount > 0) {
                 conversationItem.classList.add('unread');
@@ -168,7 +244,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    // --- Navigation Logic ---
+
+    function openChat(userId) {
+        currentOpenChatUserId = userId;
+
+        // Hide main screens and nav bar
+        document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
+        bubbleNavBar.style.display = 'none';
+
+        // Show individual chat screen
+        individualChatScreen.classList.add('active');
+
+        renderMessages(userId);
+    }
+
+    function closeChat() {
+        currentOpenChatUserId = null;
+
+        // Hide individual chat screen
+        individualChatScreen.classList.remove('active');
+
+        // Show chat list screen and nav bar
+        document.getElementById('chat-screen').classList.add('active');
+        bubbleNavBar.style.display = 'flex';
+    }
+
+
     // --- Event Listeners ---
+    conversationListContainer.addEventListener('click', (event) => {
+        const conversationItem = event.target.closest('.conversation-item');
+        if (conversationItem) {
+            const userId = parseInt(conversationItem.dataset.userId, 10);
+            openChat(userId);
+        }
+    });
+
+    backToChatListButton.addEventListener('click', closeChat);
+
     userListContainer.addEventListener('click', (event) => {
         const button = event.target.closest('.action-button');
         if (!button) return;

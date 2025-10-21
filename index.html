@@ -36,6 +36,29 @@
             <!-- Profile content will go here -->
         </div>
 
+        <!-- "Individual Chat" Screen (initially hidden) -->
+        <div id="individual-chat-screen" class="screen">
+            <header class="chat-header">
+                <button class="back-button" id="back-to-chat-list">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                </button>
+                <img src="" alt="Avatar" class="avatar" id="chat-header-avatar">
+                <div class="chat-header-info">
+                    <h3 id="chat-header-name"></h3>
+                    <!-- Optional: status like "online" or "typing..." can go here -->
+                </div>
+            </header>
+            <main class="message-list" id="message-list">
+                <!-- Messages will be injected here by JavaScript -->
+            </main>
+            <footer class="chat-input-bar">
+                <input type="text" placeholder="Escribe un mensaje..." id="message-input">
+                <button class="send-message-button">
+                    <ion-icon name="send-outline"></ion-icon>
+                </button>
+            </footer>
+        </div>
+
         <!-- Couple Request Panel (hidden by default) -->
         <div id="couple-request-panel" class="modal-overlay" style="display: none;">
             <div class="modal-content">
@@ -50,7 +73,7 @@
     </div>
 
     <!-- Bubble Navigation Menu -->
-    <nav class="bubble-nav">
+    <nav class="bubble-nav" id="bubble-nav-bar">
         <a href="#" class="nav-item active" data-screen="conocer-screen">
             <ion-icon name="people-outline"></ion-icon>
             <span>Conocer</span>
