@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const individualChatScreen = document.getElementById('individual-chat-screen');
     const backToChatListButton = document.getElementById('back-to-chat-list');
     const conversationListContainer = document.getElementById('conversation-list');
+    const chatOptionsButton = document.getElementById('chat-options-button');
+    const chatOptionsMenu = document.getElementById('chat-options-menu');
 
     // --- State Management ---
     let currentOpenChatUserId = null;
@@ -256,6 +258,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show individual chat screen
         individualChatScreen.classList.add('active');
 
+        // Ensure options menu is closed initially
+        chatOptionsMenu.classList.remove('active');
+
         renderMessages(userId);
     }
 
@@ -281,6 +286,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     backToChatListButton.addEventListener('click', closeChat);
+
+    chatOptionsButton.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevents the document click listener from firing immediately
+        chatOptionsMenu.classList.toggle('active');
+    });
+
+    document.addEventListener('click', () => {
+        if (chatOptionsMenu.classList.contains('active')) {
+            chatOptionsMenu.classList.remove('active');
+        }
+    });
 
     userListContainer.addEventListener('click', (event) => {
         const button = event.target.closest('.action-button');

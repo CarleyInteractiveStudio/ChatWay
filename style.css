@@ -692,3 +692,55 @@ header {
 .chat-input-bar .send-message-button:hover {
     background: var(--secondary-color);
 }
+
+/* --- Chat Options Menu --- */
+.chat-header-info {
+    flex-grow: 1;
+}
+
+.chat-options-container {
+    position: relative;
+}
+
+.options-button {
+    background: none;
+    border: none;
+    font-size: 1.8em;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 5px;
+}
+
+.options-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: var(--white-color);
+    border-radius: var(--card-radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 10px 0;
+    width: 150px;
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.options-menu.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.options-menu .menu-item {
+    display: block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: background-color 0.2s ease;
+}
+
+.options-menu .menu-item:hover {
+    background-color: var(--bg-color);
+}
