@@ -612,6 +612,13 @@ header {
     border-bottom-right-radius: 5px;
 }
 
+.sender-name {
+    font-size: 0.8em;
+    font-weight: bold;
+    color: var(--secondary-color);
+    margin-bottom: 4px;
+}
+
 /* --- Reply Preview --- */
 .reply-preview {
     background-color: rgba(0,0,0,0.05);

@@ -36,6 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 3, senderId: 1, text: "La cinematografía era espectacular.", timestamp: "18:28", status: "delivered", repliedToId: null },
             { id: 4, senderId: 2, text: "Totalmente de acuerdo. Necesitamos ir a ver otra pronto.", timestamp: "18:30", status: "seen", repliedToId: null },
             { id: 5, senderId: 1, text: "¡Claro! ¿A qué hora nos vemos?", timestamp: "18:32", status: "sent", repliedToId: null },
+        ],
+        // Group Chat for "Comunidad" (groupId: 101)
+        101: [
+            { id: 6, senderId: 3, text: "¡Hola a todos! ¿Qué tal?", timestamp: "10:00", status: "seen", repliedToId: null },
+            { id: 7, senderId: 1, text: "¡Hola Sofía! Todo bien por aquí, ¿y tú?", timestamp: "10:01", status: "sent", repliedToId: null },
+            { id: 8, senderId: 5, text: "¡Buen día! Preparándome para el fin de semana.", timestamp: "10:02", status: "seen", repliedToId: null },
+            { id: 9, senderId: 3, text: "¡Genial! Yo también. ¿Alguien tiene planes interesantes?", timestamp: "10:03", status: "seen", repliedToId: 8 }
         ]
     };
 
@@ -51,7 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatOptionsMenu = document.getElementById('chat-options-menu');
 
     // --- State Management ---
-    let currentOpenChatUserId = null;
+    let currentOpenChatId = null;
+
+    function getConversationParticipant(id) {
+        if (id === communityGroup.id) {
+            return communityGroup;
+        }
+        return users.find(u => u.id === id);
+    }
 
     function getUser(id) {
         return users.find(u => u.id === id);
@@ -159,22 +173,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 </button>`;
     }
 
-    function renderMessages(userId) {
+    function renderMessages(chatId) {
         const messageListContainer = document.getElementById('message-list');
-        const user = getUser(userId);
-        if (!messageListContainer || !user) return;
+        const chatParticipant = getConversationParticipant(chatId);
+        if (!messageListContainer || !chatParticipant) return;
 
         // Update header
-        document.getElementById('chat-header-avatar').src = user.avatar;
-        document.getElementById('chat-header-name').textContent = user.name;
+        document.getElementById('chat-header-avatar').src = chatParticipant.avatar;
+        document.getElementById('chat-header-name').textContent = chatParticipant.name;
 
         messageListContainer.innerHTML = '';
-        const chatMessages = messages[userId] || [];
+        const chatMessages = messages[chatId] || [];
 
         chatMessages.forEach(msg => {
             const messageBubble = document.createElement('div');
             const isSent = msg.senderId === currentUser.id;
             messageBubble.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
+
+            let senderNameHTML = '';
+            // If it's a group chat and the message is not from the current user, show sender's name
+            if (chatParticipant.memberCount && !isSent) {
+                const sender = getUser(msg.senderId);
+                if (sender) {
+                    senderNameHTML = `<div class="sender-name">${sender.name}</div>`;
+                }
+            }
 
             let repliedMessageHTML = '';
             if (msg.repliedToId) {
@@ -191,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             messageBubble.innerHTML = `
+                ${senderNameHTML}
                 ${repliedMessageHTML}
                 <p class="message-text">${msg.text}</p>
                 <div class="message-meta">
@@ -320,8 +344,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Navigation Logic ---
 
-    function openChat(userId) {
-        currentOpenChatUserId = userId;
+    function openChat(chatId) {
+        currentOpenChatId = chatId;
 
         // Hide main screens and nav bar
         document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
@@ -333,11 +357,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Ensure options menu is closed initially
         chatOptionsMenu.classList.remove('active');
 
-        renderMessages(userId);
+        renderMessages(chatId);
     }
 
     function closeChat() {
-        currentOpenChatUserId = null;
+        currentOpenChatId = null;
 
         // Hide individual chat screen
         individualChatScreen.classList.remove('active');
@@ -349,6 +373,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Event Listeners ---
+    document.querySelector('.mundo-content').addEventListener('click', (event) => {
+        const groupCard = event.target.closest('.group-card');
+        if (groupCard) {
+            openChat(communityGroup.id);
+        }
+    });
+
     conversationListContainer.addEventListener('click', (event) => {
         const conversationItem = event.target.closest('.conversation-item');
         if (conversationItem) {
