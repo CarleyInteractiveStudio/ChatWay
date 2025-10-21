@@ -901,3 +901,86 @@ header {
 .action-item.logout-button ion-icon {
     color: #ff6b6b;
 }
+
+/* --- Mundo Screen --- */
+.mundo-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.group-card {
+    display: flex;
+    align-items: center;
+    background-color: var(--white-color);
+    padding: 15px;
+    border-radius: var(--card-radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.group-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.group-card .avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+    border: 2px solid var(--primary-color);
+}
+
+.group-details {
+    flex-grow: 1;
+}
+
+.group-details h3 {
+    margin: 0 0 4px 0;
+    font-family: 'Pacifico', cursive;
+    font-size: 1.4em;
+    color: var(--primary-color);
+}
+
+.group-details p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.group-meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.group-meta .member-count {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9em;
+    color: #888;
+}
+
+.group-meta .member-count ion-icon {
+    font-size: 1.2em;
+}
+
+.group-meta .unread-count {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-size: 0.8em;
+    font-weight: bold;
+    border-radius: 50%;
+    min-width: 22px;
+    height: 22px;
+    padding: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

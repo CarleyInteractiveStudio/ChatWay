@@ -12,6 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
         { fromId: 4, toId: 1, message: "¡Hola Luna! Llevamos un tiempo siendo amigos y me gustaría que fuéramos pareja. ¿Qué dices? :)", status: 'pending' }
     ];
 
+    let communityGroup = {
+        id: 101,
+        name: 'Comunidad',
+        avatar: 'https://cdn-icons-png.flaticon.com/512/1534/1534035.png', // Temporary community icon
+        lastMessage: '¡Bienvenidos a la comunidad de ChatWey!',
+        unreadCount: 5,
+        memberCount: users.length
+    };
+
     let conversations = [
         { userId: 2, lastMessage: "¡Claro! ¿A qué hora nos vemos?", timestamp: "18:32", unreadCount: 0, isTyping: false },
         { userId: 4, lastMessage: "Recibiste una solicitud de pareja.", timestamp: "Ayer", unreadCount: 1, isTyping: false },
@@ -249,6 +258,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function renderMundo() {
+        const mundoContent = document.querySelector('.mundo-content');
+        if (!mundoContent) return;
+
+        mundoContent.innerHTML = `
+            <div class="group-card">
+                <img src="${communityGroup.avatar}" alt="${communityGroup.name}" class="avatar">
+                <div class="group-details">
+                    <h3>${communityGroup.name}</h3>
+                    <p>${communityGroup.lastMessage}</p>
+                </div>
+                <div class="group-meta">
+                    <span class="member-count">
+                        <ion-icon name="people-sharp"></ion-icon>
+                        ${communityGroup.memberCount}
+                    </span>
+                    ${communityGroup.unreadCount > 0 ? `<span class="unread-count">${communityGroup.unreadCount}</span>` : ''}
+                </div>
+            </div>
+        `;
+    }
+
     function renderChat() {
         if (!conversationListContainer) return;
 
@@ -439,6 +470,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (screenId === 'perfil-screen') {
                 renderProfile();
+            } else if (screenId === 'mundo-screen') {
+                renderMundo();
             }
         });
     });
