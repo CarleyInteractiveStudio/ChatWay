@@ -23,12 +23,29 @@
 
         <!-- "Chat" Screen (initially hidden) -->
         <div id="chat-screen" class="screen">
-            <!-- Chat content will go here -->
+            <header>
+                <h2 class="screen-title">Chat</h2>
+            </header>
+            <main id="chat-messages">
+                <!-- Couple request letters will be injected here -->
+            </main>
         </div>
 
         <!-- "Perfil" Screen (initially hidden) -->
         <div id="perfil-screen" class="screen">
             <!-- Profile content will go here -->
+        </div>
+
+        <!-- Couple Request Panel (hidden by default) -->
+        <div id="couple-request-panel" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h3>Escribe un mensaje especial</h3>
+                <textarea id="couple-request-message" placeholder="Tu mensaje aquí..."></textarea>
+                <button id="send-couple-request" class="send-button">Enviar Carta</button>
+                <button id="cancel-couple-request" class="cancel-button">
+                    <ion-icon name="close-outline"></ion-icon>
+                </button>
+            </div>
         </div>
     </div>
 
