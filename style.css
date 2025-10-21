@@ -744,3 +744,160 @@ header {
 .options-menu .menu-item:hover {
     background-color: var(--bg-color);
 }
+
+/* --- Profile Screen --- */
+.profile-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.profile-header {
+    text-align: center;
+}
+
+.profile-avatar-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 15px auto;
+}
+
+#profile-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 4px solid var(--primary-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.edit-profile-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.4em;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease;
+}
+
+.edit-profile-button:hover {
+    background-color: var(--primary-color);
+}
+
+#profile-name {
+    font-family: 'Pacifico', cursive;
+    font-size: 2em;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+#profile-bio {
+    color: #666;
+    margin-top: 5px;
+}
+
+/* --- Relationship Card --- */
+.profile-relationship-card {
+    background-color: var(--white-color);
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    border-radius: var(--card-radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.profile-relationship-card h4 {
+    margin: 0 0 10px;
+    font-family: 'Pacifico', cursive;
+    color: var(--secondary-color);
+    font-size: 1.4em;
+}
+
+.profile-relationship-card p {
+    margin: 0 0 15px;
+    color: #666;
+}
+
+.partner-info {
+    margin-bottom: 15px;
+}
+
+.partner-info .avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid var(--secondary-color);
+    margin: 5px 0;
+}
+
+.find-partner-button, .breakup-button {
+    border: none;
+    padding: 12px 25px;
+    border-radius: var(--bubble-radius);
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.find-partner-button {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+.breakup-button {
+    background-color: #ff6b6b; /* A distinct red for breaking up */
+    color: var(--white-color);
+}
+.find-partner-button:hover, .breakup-button:hover {
+    transform: scale(1.05);
+}
+
+/* --- Profile Actions List --- */
+.profile-actions-list {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    background-color: var(--white-color);
+    padding: 15px 20px;
+    border-radius: var(--card-radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    text-decoration: none;
+    color: var(--text-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.action-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.action-item ion-icon {
+    font-size: 1.5em;
+    color: var(--primary-color);
+    margin-right: 20px;
+}
+
+.action-item span {
+    font-size: 1.1em;
+}
+
+.action-item.logout-button ion-icon {
+    color: #ff6b6b;
+}

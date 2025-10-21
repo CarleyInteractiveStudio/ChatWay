@@ -33,7 +33,44 @@
 
         <!-- "Perfil" Screen (initially hidden) -->
         <div id="perfil-screen" class="screen">
-            <!-- Profile content will go here -->
+            <header>
+                <h2 class="screen-title">Perfil</h2>
+            </header>
+            <main class="profile-content">
+                <div class="profile-header">
+                    <div class="profile-avatar-container">
+                        <img src="" alt="Avatar de Perfil" id="profile-avatar">
+                        <button class="edit-profile-button">
+                            <ion-icon name="pencil-outline"></ion-icon>
+                        </button>
+                    </div>
+                    <h3 id="profile-name"></h3>
+                    <p id="profile-bio">¡Hola! Estoy usando ChatWey.</p>
+                </div>
+
+                <div class="profile-relationship-card" id="relationship-card">
+                    <!-- This will be dynamically filled by JS -->
+                </div>
+
+                <div class="profile-actions-list">
+                    <a href="#" class="action-item">
+                        <ion-icon name="settings-outline"></ion-icon>
+                        <span>Ajustes de la cuenta</span>
+                    </a>
+                    <a href="#" class="action-item">
+                        <ion-icon name="notifications-outline"></ion-icon>
+                        <span>Notificaciones</span>
+                    </a>
+                    <a href="#" class="action-item">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Invitar amigos</span>
+                    </a>
+                    <a href="#" class="action-item logout-button">
+                        <ion-icon name="log-out-outline"></ion-icon>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </div>
+            </main>
         </div>
 
         <!-- "Individual Chat" Screen (initially hidden) -->

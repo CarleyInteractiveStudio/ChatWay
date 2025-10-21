@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Data Models ---
     let users = [
-        { id: 1, name: 'Luna', avatar: 'https://i.pravatar.cc/150?u=luna', isFriend: true, partnerId: null },
+        { id: 1, name: 'Luna', avatar: 'https://i.pravatar.cc/150?u=luna', isFriend: true, partnerId: 4 },
         { id: 2, name: 'Mateo', avatar: 'https://i.pravatar.cc/150?u=mateo', isFriend: true, partnerId: 5 },
         { id: 3, name: 'Sofía', avatar: 'https://i.pravatar.cc/150?u=sofia', isFriend: false, partnerId: null },
-        { id: 4, name: 'Leo', avatar: 'https://i.pravatar.cc/150?u=leo', isFriend: true, partnerId: null },
+        { id: 4, name: 'Leo', avatar: 'https://i.pravatar.cc/150?u=leo', isFriend: true, partnerId: 1 },
         { id: 5, name: 'Valeria', avatar: 'https://i.pravatar.cc/150?u=valeria', isFriend: true, partnerId: 2 },
     ];
 
@@ -208,6 +208,47 @@ document.addEventListener('DOMContentLoaded', () => {
         return `<ion-icon name="${iconName}" class="${className}"></ion-icon>`;
     }
 
+    function renderProfile() {
+        const user = getUser(currentUser.id);
+        if (!user) return;
+
+        // Fill basic info
+        document.getElementById('profile-avatar').src = user.avatar;
+        document.getElementById('profile-name').textContent = user.name;
+
+        // Render relationship card
+        const relationshipCard = document.getElementById('relationship-card');
+        if (user.partnerId) {
+            const partner = getUser(user.partnerId);
+            relationshipCard.innerHTML = `
+                <div class="partner-info">
+                    <h4>Tu Pareja</h4>
+                    <img src="${partner.avatar}" alt="${partner.name}" class="avatar">
+                    <p>${partner.name}</p>
+                </div>
+                <button class="breakup-button">Romper relación</button>
+            `;
+            relationshipCard.querySelector('.breakup-button').addEventListener('click', () => {
+                const reason = prompt("Por favor, introduce el motivo de la ruptura:");
+                if (reason) {
+                    alert(`Relación terminada. Motivo: ${reason}`);
+                    // Here you would add the logic to actually break up
+                }
+            });
+
+        } else {
+            relationshipCard.innerHTML = `
+                <h4>¡Encuentra tu pareja ideal!</h4>
+                <p>Aún estás soltero/a. ¡Empieza a conocer gente y encuentra a tu media naranja!</p>
+                <button class="find-partner-button">Buscar Pareja</button>
+            `;
+            relationshipCard.querySelector('.find-partner-button').addEventListener('click', () => {
+                // Navigate to 'conocer' screen
+                document.querySelector('.nav-item[data-screen="conocer-screen"]').click();
+            });
+        }
+    }
+
     function renderChat() {
         if (!conversationListContainer) return;
 
@@ -392,7 +433,13 @@ document.addEventListener('DOMContentLoaded', () => {
             navItems.forEach(i => i.classList.remove('active'));
             screens.forEach(s => s.classList.remove('active'));
             item.classList.add('active');
-            document.getElementById(item.dataset.screen).classList.add('active');
+
+            const screenId = item.dataset.screen;
+            document.getElementById(screenId).classList.add('active');
+
+            if (screenId === 'perfil-screen') {
+                renderProfile();
+            }
         });
     });
 
