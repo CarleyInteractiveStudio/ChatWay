@@ -443,3 +443,88 @@ header {
 .nav-item.active {
     color: var(--primary-color);
 }
+
+/* --- Conversation List --- */
+.conversation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
+    background-color: var(--white-color);
+    padding: 15px;
+    border-radius: var(--card-radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.conversation-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.conversation-item .avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+    border: 2px solid var(--secondary-color);
+}
+
+.conversation-details {
+    flex-grow: 1;
+}
+
+.conversation-details h3 {
+    margin: 0 0 4px 0;
+    font-family: 'Pacifico', cursive;
+    font-size: 1.4em;
+    color: var(--primary-color);
+}
+
+.conversation-details p {
+    margin: 0;
+    color: #666;
+}
+
+.conversation-meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.conversation-meta .timestamp {
+    font-size: 0.8em;
+    color: #999;
+}
+
+.conversation-meta .unread-count {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-size: 0.8em;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- Unread and Typing Indicators --- */
+.conversation-item.unread .conversation-details p {
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.typing-indicator {
+    color: var(--secondary-color) !important;
+    font-style: italic;
+}

@@ -12,11 +12,16 @@ document.addEventListener('DOMContentLoaded', () => {
         { fromId: 4, toId: 1, message: "¡Hola Luna! Llevamos un tiempo siendo amigos y me gustaría que fuéramos pareja. ¿Qué dices? :)", status: 'pending' }
     ];
 
+    let conversations = [
+        { userId: 2, lastMessage: "¡Claro! ¿A qué hora nos vemos?", timestamp: "18:32", unreadCount: 0, isTyping: false },
+        { userId: 4, lastMessage: "Recibiste una solicitud de pareja.", timestamp: "Ayer", unreadCount: 1, isTyping: false },
+        { userId: 5, lastMessage: "Jajaja, qué gracioso.", timestamp: "1/3/2025", unreadCount: 3, isTyping: true },
+    ];
+
     // Represents the current logged-in user.
     const currentUser = { id: 1 };
 
     const userListContainer = document.querySelector('.user-list');
-    const chatMessagesContainer = document.getElementById('chat-messages');
 
     // --- State Management ---
     function getUser(id) {
@@ -126,48 +131,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderChat() {
-        chatMessagesContainer.innerHTML = '';
-        const receivedRequests = coupleRequests.filter(r => r.toId === currentUser.id && r.status === 'pending');
+        const conversationListContainer = document.getElementById('conversation-list');
+        if (!conversationListContainer) return;
 
-        receivedRequests.forEach(request => {
-            const sender = getUser(request.fromId);
-            const letterHTML = `
-                <div class="letter-container" data-from-id="${request.fromId}">
-                    <div class="letter-envelope">
-                        <ion-icon name="heart"></ion-icon>
-                    </div>
-                    <div class="letter-content">
-                        <p>De: ${sender.name}</p>
-                        <p>${request.message}</p>
-                        <div class="letter-actions">
-                            <button class="action-button accept" data-action="accept"><ion-icon name="checkmark-outline"></ion-icon></button>
-                            <button class="action-button reject" data-action="reject"><ion-icon name="close-outline"></ion-icon></button>
-                        </div>
-                    </div>
+        conversationListContainer.innerHTML = '';
+
+        conversations.forEach(conv => {
+            const user = getUser(conv.userId);
+            if (!user) return;
+
+            const conversationItem = document.createElement('div');
+            conversationItem.className = 'conversation-item';
+
+            if (conv.unreadCount > 0) {
+                conversationItem.classList.add('unread');
+            }
+
+            const lastMessageOrTyping = conv.isTyping
+                ? `<p class="typing-indicator">Escribiendo...</p>`
+                : `<p>${conv.lastMessage}</p>`;
+
+            conversationItem.innerHTML = `
+                <img src="${user.avatar}" alt="${user.name}" class="avatar">
+                <div class="conversation-details">
+                    <h3>${user.name}</h3>
+                    ${lastMessageOrTyping}
+                </div>
+                <div class="conversation-meta">
+                    <span class="timestamp">${conv.timestamp}</span>
+                    ${conv.unreadCount > 0 ? `<span class="unread-count">${conv.unreadCount}</span>` : ''}
                 </div>
             `;
-            chatMessagesContainer.innerHTML += letterHTML;
+
+            conversationListContainer.appendChild(conversationItem);
         });
     }
 
 
     // --- Event Listeners ---
-    chatMessagesContainer.addEventListener('click', (event) => {
-        const letterContainer = event.target.closest('.letter-container');
-        if (letterContainer) {
-            const actionButton = event.target.closest('.action-button');
-            const fromId = parseInt(letterContainer.dataset.fromId, 10);
-
-            if (actionButton) {
-                const action = actionButton.dataset.action;
-                handleLetterAction(fromId, action);
-            } else {
-                // Toggle open/close only if not clicking a button
-                letterContainer.classList.toggle('open');
-            }
-        }
-    });
-
     userListContainer.addEventListener('click', (event) => {
         const button = event.target.closest('.action-button');
         if (!button) return;
@@ -268,28 +269,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initial Load ---
     render();
-
-    function handleLetterAction(fromId, action) {
-        const request = coupleRequests.find(r => r.fromId === fromId && r.toId === currentUser.id && r.status === 'pending');
-        if (!request) return;
-
-        if (action === 'accept') {
-            const sender = getUser(request.fromId);
-            const receiver = getUser(request.toId);
-
-            // Update users to be partners
-            sender.partnerId = receiver.id;
-            receiver.partnerId = sender.id;
-
-            // Mark request as accepted
-            request.status = 'accepted';
-
-        } else if (action === 'reject') {
-            // Mark request as rejected
-            request.status = 'rejected';
-        }
-
-        // Re-render everything to reflect the change
-        render();
-    }
 });
