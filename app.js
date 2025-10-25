@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Data Models ---
     let users = [
-        { id: 1, name: 'Luna', avatar: 'https://i.pravatar.cc/150?u=luna', isFriend: true, partnerId: 4 },
-        { id: 2, name: 'Mateo', avatar: 'https://i.pravatar.cc/150?u=mateo', isFriend: true, partnerId: 5 },
-        { id: 3, name: 'Sofía', avatar: 'https://i.pravatar.cc/150?u=sofia', isFriend: false, partnerId: null },
-        { id: 4, name: 'Leo', avatar: 'https://i.pravatar.cc/150?u=leo', isFriend: true, partnerId: 1 },
-        { id: 5, name: 'Valeria', avatar: 'https://i.pravatar.cc/150?u=valeria', isFriend: true, partnerId: 2 },
+        { id: 1, name: 'Luna', avatar: 'https://i.pravatar.cc/150?u=luna', isFriend: true, partnerId: 4, isPremium: false },
+        { id: 2, name: 'Mateo', avatar: 'https://i.pravatar.cc/150?u=mateo', isFriend: true, partnerId: 5, isPremium: true },
+        { id: 3, name: 'Sofía', avatar: 'https://i.pravatar.cc/150?u=sofia', isFriend: false, partnerId: null, isPremium: false },
+        { id: 4, name: 'Leo', avatar: 'https://i.pravatar.cc/150?u=leo', isFriend: true, partnerId: 1, isPremium: false },
+        { id: 5, name: 'Valeria', avatar: 'https://i.pravatar.cc/150?u=valeria', isFriend: true, partnerId: 2, isPremium: false },
     ];
 
     let coupleRequests = [
@@ -263,6 +263,24 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('profile-avatar').src = user.avatar;
         document.getElementById('profile-name').textContent = user.name;
 
+        // Render Premium section
+        const premiumSection = document.getElementById('premium-section');
+        if (user.isPremium) {
+            premiumSection.innerHTML = `
+                <div class="premium-badge">
+                    <ion-icon name="star"></ion-icon>
+                    <span>Usuario Premium</span>
+                </div>
+            `;
+        } else {
+            premiumSection.innerHTML = `
+                <button class="premium-button">
+                    <ion-icon name="star-outline"></ion-icon>
+                    Hazte Premium
+                </button>
+            `;
+        }
+
         // Render relationship card
         const relationshipCard = document.getElementById('relationship-card');
         if (user.partnerId) {
@@ -437,6 +455,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Event Listeners ---
+    document.getElementById('perfil-screen').addEventListener('click', (event) => {
+        if (event.target.closest('.premium-button')) {
+            // Find the hidden nav item for the premium screen and click it
+            document.querySelector('.nav-item[data-screen="premium-screen"]').click();
+        }
+    });
+
     document.querySelector('.mundo-content').addEventListener('click', (event) => {
         const groupCard = event.target.closest('.group-card');
         if (groupCard) {

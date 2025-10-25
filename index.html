@@ -68,6 +68,10 @@
                     <p id="profile-bio">¡Hola! Estoy usando ChatWey.</p>
                 </div>
 
+                <div class="profile-premium-section" id="premium-section">
+                    <!-- Premium status or button will be injected here by JS -->
+                </div>
+
                 <div class="profile-relationship-card" id="relationship-card">
                     <!-- This will be dynamically filled by JS -->
                 </div>
@@ -90,6 +94,17 @@
                         <span>Cerrar Sesión</span>
                     </a>
                 </div>
+            </main>
+        </div>
+
+        <!-- "Premium" Screen (initially hidden) -->
+        <div id="premium-screen" class="screen">
+            <header>
+                <h2 class="screen-title">ChatWey Premium</h2>
+            </header>
+            <main class="premium-content">
+                <h3>¡Próximamente!</h3>
+                <p>Descubre los beneficios exclusivos de ser un miembro Premium y lleva tu experiencia al siguiente nivel.</p>
             </main>
         </div>
 
@@ -161,6 +176,8 @@
             <ion-icon name="person-outline"></ion-icon>
             <span>Perfil</span>
         </a>
+        <!-- Hidden nav item for programmatic navigation -->
+        <a href="#" class="nav-item" data-screen="premium-screen" style="display: none;"></a>
     </nav>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
