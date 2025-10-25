@@ -21,6 +21,20 @@ document.addEventListener('DOMContentLoaded', () => {
         memberCount: users.length
     };
 
+    let games = [
+        // Juegos de Pareja (2 personas)
+        { id: 1, name: 'Verdad o Reto', image: 'https://i.blogs.es/228d6a/truth-or-dare-en-android/1366_2000.jpg', category: 'pareja' },
+        { id: 2, name: 'Preguntas Íntimas', image: 'https://www.psicoactiva.com/wp-content/uploads/2021/07/juego-preguntas-pareja.jpg', category: 'pareja' },
+
+        // Juegos de Doble Pareja (4 personas)
+        { id: 3, name: 'Pictionary de Parejas', image: 'https://i.ytimg.com/vi/u02-r_i-u00/maxresdefault.jpg', category: 'doble_pareja' },
+        { id: 4, name: 'Charadas en Equipo', image: 'https://www.shutterstock.com/image-vector/charades-horizontal-banner-flat-illustration-600nw-2111162231.jpg', category: 'doble_pareja' },
+
+        // Juegos de Varias Parejas (más de 4)
+        { id: 5, name: 'Torneo de Mímica', image: 'https://previews.123rf.com/images/stockgiu/stockgiu1909/stockgiu190909476/129753272-parejas-felices-en-la-noche-de-juegos-paisaje-urbano-ilustraci%C3%B3n-vectorial.jpg', category: 'varias_parejas' },
+        { id: 6, name: 'Concurso de Baile', image: 'https://img.freepik.com/vector-premium/fiesta-baile-gente-bailando-discoteca-noche-personajes-dibujos-animados-plana_176411-2086.jpg', category: 'varias_parejas' }
+    ];
+
     let conversations = [
         { userId: 2, lastMessage: "¡Claro! ¿A qué hora nos vemos?", timestamp: "18:32", unreadCount: 0, isTyping: false },
         { userId: 4, lastMessage: "Recibiste una solicitud de pareja.", timestamp: "Ayer", unreadCount: 1, isTyping: false },
@@ -282,6 +296,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function renderGames() {
+        const gameContent = document.querySelector('.game-content');
+        if (!gameContent) return;
+
+        gameContent.innerHTML = ''; // Clear previous content
+
+        const categories = {
+            pareja: 'Para Parejas (2 Jugadores)',
+            doble_pareja: 'Doble Pareja (4 Jugadores)',
+            varias_parejas: 'Varias Parejas (+4 Jugadores)'
+        };
+
+        for (const categoryKey in categories) {
+            const categoryGames = games.filter(game => game.category === categoryKey);
+            if (categoryGames.length > 0) {
+                // Add category title
+                const categoryTitle = document.createElement('h3');
+                categoryTitle.className = 'game-category-title';
+                categoryTitle.textContent = categories[categoryKey];
+                gameContent.appendChild(categoryTitle);
+
+                // Add container for game cards
+                const gamesContainer = document.createElement('div');
+                gamesContainer.className = 'games-container';
+
+                categoryGames.forEach(game => {
+                    const gameCard = document.createElement('div');
+                    gameCard.className = 'game-card';
+                    gameCard.innerHTML = `
+                        <div class="game-card-image-container">
+                            <img src="${game.image}" alt="${game.name}">
+                        </div>
+                        <div class="game-card-info">
+                            <h4>${game.name}</h4>
+                            <div class="game-card-actions">
+                                <button class="play-button">Jugar</button>
+                                <button class="options-button">
+                                    <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    gamesContainer.appendChild(gameCard);
+                });
+
+                gameContent.appendChild(gamesContainer);
+            }
+        }
+    }
+
     function renderMundo() {
         const mundoContent = document.querySelector('.mundo-content');
         if (!mundoContent) return;
@@ -503,6 +567,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderProfile();
             } else if (screenId === 'mundo-screen') {
                 renderMundo();
+            } else if (screenId === 'game-screen') {
+                renderGames();
             }
         });
     });
